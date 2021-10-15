@@ -1,0 +1,71 @@
+{
+  "name": "gist-vscode",
+  "displayName": "Gist for VSCode",
+  "description": "About gist, do what you want",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.61.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "publisher": "whosydd",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whosydd/gist-vscode.git"
+  },
+  "activationEvents": [
+    "onCommand:gist-vscode.setToken",
+    "onCommand:gist-vscode.getAuthUserGists"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gist-vscode.setToken",
+        "title": "set token",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.getAuthUserGists",
+        "title": "get user gists",
+        "category": "Gist"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p -w . --outDir out",
+    "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/download": "^8.0.1",
+    "@types/glob": "^7.1.4",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.11.0",
+    "@types/vscode": "^1.61.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.1",
+    "@typescript-eslint/parser": "^4.31.1",
+    "@vscode/test-electron": "^1.6.2",
+    "eslint": "^7.32.0",
+    "glob": "^7.1.7",
+    "mocha": "^9.1.1",
+    "prettier": "^2.4.1",
+    "ts-loader": "^9.2.5",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.3",
+    "webpack": "^5.52.1",
+    "webpack-cli": "^4.8.0"
+  },
+  "dependencies": {
+    "@octokit/rest": "^18.12.0",
+    "axios": "^0.23.0",
+    "download": "^8.0.0"
+  }
+}
