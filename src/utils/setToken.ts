@@ -3,8 +3,9 @@ import * as vscode from 'vscode'
 export default async (context: vscode.ExtensionContext) => {
   const token: string | undefined = await vscode.window.showInputBox({
     title: 'Gist for VSCode',
-    value: '请输入 https://github.com/settings/tokens 获取的 Personal access tokens',
+    value: 'Please enter <Personal access tokens> from https://github.com/settings/tokens',
   })
+  // HOW:关于各种通知的语言设置
   try {
     if (token === undefined) throw new Error('未完成设置Token！')
 

@@ -16,22 +16,55 @@
   },
   "activationEvents": [
     "onCommand:gist-vscode.setToken",
-    "onCommand:gist-vscode.getAuthUserGists"
+    "onCommand:gist-vscode.reload",
+    "onCommand:gist-vscode.getAuthUserGists",
+    "onCommand:gist-vscode.createGistByFile",
+    "onCommand:gist-vscode.delGist"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "gist-vscode.setToken",
-        "title": "set token",
-        "category": "Gist"
+        "title": "Gist: set token"
+      },
+      {
+        "command": "gist-vscode.reload",
+        "title": "Gist: reload gist"
       },
       {
         "command": "gist-vscode.getAuthUserGists",
-        "title": "get user gists",
-        "category": "Gist"
+        "title": "Gist: get user gists"
+      },
+      {
+        "command": "gist-vscode.createGistByFile",
+        "title": "Gist: create gist"
+      },
+      {
+        "command": "gist-vscode.delGist",
+        "title": "Gist: remove gist"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "when": "null"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "group": "2_workspace",
+          "when": "filesExplorerFocus && !explorerResourceIsFolder && !inputFocus"
+        },
+        {
+          "command": "gist-vscode.delGist",
+          "group": "2_workspace",
+          "when": "explorerResourceIsFolder && !inputFocus"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
