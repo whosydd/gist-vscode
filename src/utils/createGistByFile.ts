@@ -1,9 +1,10 @@
-import { Octokit } from '@octokit/rest'
 import * as fs from 'fs'
 import * as vscode from 'vscode'
+import octokit from '../config/octokit'
+import { setTokenTip } from './tips'
 import path = require('path')
 
-export default async (file: any, octokit: Octokit, context: vscode.ExtensionContext) => {
+export default async (file: any, context: vscode.ExtensionContext) => {
   // 获取文件
   const filePath = file.fsPath
 
@@ -18,12 +19,16 @@ export default async (file: any, octokit: Octokit, context: vscode.ExtensionCont
   })
 
   // 判断是否手快没改描述
-  if (description === `Description for ${filename}`) {
-    vscode.window.showWarningMessage('建议不要使用默认的desc~')
+  let n = 0
+  while (description === `Description for ${filename}` && n < 3) {
+    vscode.window.showWarningMessage(
+      `Don't use this~${n === 2 ? '  Important things need to be repeated for three times!!!' : ''}`
+    )
     await vscode.window.showInputBox({
-      title: 'Gist: create a gist',
+      title: 'Gist: create gist',
       value: `Description for ${filename}`,
     })
+    n++
   }
 
   const body = {
@@ -36,9 +41,19 @@ export default async (file: any, octokit: Octokit, context: vscode.ExtensionCont
       },
     },
   }
-  // 发送请求
-  octokit.rest.gists.create(body).then(res => {
-    if (res.status === 201) vscode.window.showInformationMessage('gist创建成功！')
-    else vscode.window.showErrorMessage('gist创建失败！')
-  })
+
+  try {
+    // 获取token
+    const token: { default: string } | undefined = context.globalState.get('token')
+    if (token === undefined) throw new Error('token not set yet')
+    // 发送请求
+    octokit(token.default)
+      .rest.gists.create(body)
+      .then(res => {
+        if (res.status === 201) vscode.window.showInformationMessage('Done!')
+        else vscode.window.showErrorMessage('Failed!')
+      })
+  } catch (error: any) {
+    setTokenTip(error)
+  }
 }

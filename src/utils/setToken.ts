@@ -19,7 +19,7 @@ export default async (context: vscode.ExtensionContext) => {
 
     // 扩展范围内保存token
     context.globalState.update('token', { [user]: token })
-    vscode.window.showInformationMessage('Successfully!')
+    vscode.window.showInformationMessage('Success!')
   } catch (error: any) {
     vscode.window.showErrorMessage(error.message, 'Try again', 'Later').then(value => {
       if (value === 'Try again') vscode.commands.executeCommand('gist-vscode.setToken')

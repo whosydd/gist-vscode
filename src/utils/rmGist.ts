@@ -1,28 +1,45 @@
-import { Octokit } from '@octokit/rest'
 import * as vscode from 'vscode'
+import updateAuthUserGists from '../api/updateAuthUserGists'
+import octokit from '../config/octokit'
+import { setTokenTip } from './tips'
 
-export default async (octokit: Octokit, context: vscode.ExtensionContext) => {
-  await vscode.commands.executeCommand('gist-vscode.reload')
-  const gistIds: object[] | undefined = context.workspaceState.get('gistId')
+export default async (context: vscode.ExtensionContext) => {
+  try {
+    // 先获取最新的gists列表
+    const { files, pickList } = await updateAuthUserGists(context)
+    // const rmList = files.filter(item => {
+    //   const i = Object.values(item)[0].isDownload
+    // })
 
-  if (gistIds === undefined) throw new Error('还未储存任何gist_id!')
+    // const list = files.flatMap(item => `${Object.keys(item)} -- ${Object.values(item)}`)
 
-  // const rmList = gistIds.filter(item => {
-  //   const i = Object.values(item)[0].isDownload
-  // })
+    const pickFiles = await vscode.window.showQuickPick(pickList, {
+      canPickMany: true,
+    })
 
-  const list = gistIds.flatMap(item => `${Object.keys(item)} -- ${Object.values(item)}`)
+    if (pickFiles === undefined) return
 
-  const pickFiles = await vscode.window.showQuickPick(list, {
-    canPickMany: true,
-  })
+    // 获取token
+    const token: { default: string } | undefined = context.globalState.get('token')
+    if (token === undefined) throw new Error('token not set yet')
 
-  if (pickFiles === undefined) return
+    // FIX: 当删除多个同名文件时，总是删除第一个匹配的
+    let rmList: object[] = []
+    pickFiles.forEach(pickFile => {
+      // 获取gist_id
+      const [filename, _] = pickFile.split(/ -- /)
+      // if (Object.keys(pickFile[0] === filename)) rmList.push(pickFile)
+      // const file = files.filter(item => Object.keys(item)[0] === filename)
+      // rmList.push(...file)
+      // rmList.push(Object.values(file)[0].gist_id)
+      // const gist_id = Object.values(file)[0].gist_id
+    })
+    console.log(rmList)
 
-  pickFiles.forEach(item => {
-    const [_, gist_id] = item.split(' -- ')
     // 发送请求
-    octokit.rest.gists.delete({ gist_id })
-  })
-  vscode.window.showInformationMessage('Select is already removed')
+    // octokit(token.default).rest.gists.delete({ gist_id })
+    vscode.window.showInformationMessage('Select is already removed')
+  } catch (error: any) {
+    setTokenTip(error)
+  }
 }

@@ -16,7 +16,6 @@
   },
   "activationEvents": [
     "onCommand:gist-vscode.setToken",
-    "onCommand:gist-vscode.reload",
     "onCommand:gist-vscode.getAuthUserGists",
     "onCommand:gist-vscode.createGistByFile",
     "onCommand:gist-vscode.delGist"
@@ -29,16 +28,13 @@
         "title": "Gist: set token"
       },
       {
-        "command": "gist-vscode.reload",
-        "title": "Gist: reload gist"
-      },
-      {
         "command": "gist-vscode.getAuthUserGists",
         "title": "Gist: get user gists"
       },
       {
         "command": "gist-vscode.createGistByFile",
-        "title": "Gist: create gist"
+        "title": "Gist: create gist",
+        "icon": "$(cloud-upload)"
       },
       {
         "command": "gist-vscode.delGist",
@@ -57,14 +53,33 @@
           "command": "gist-vscode.createGistByFile",
           "group": "2_workspace",
           "when": "filesExplorerFocus && !explorerResourceIsFolder && !inputFocus"
-        },
+        }
+      ],
+      "editor/context": [
         {
-          "command": "gist-vscode.delGist",
-          "group": "2_workspace",
-          "when": "explorerResourceIsFolder && !inputFocus"
+          "command": "gist-vscode.createGistByFile",
+          "group": "0_modification"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "group": "navigation"
         }
       ]
-    }
+    },
+    "configuration": [
+      {
+        "title": "Gist for VSCode: configuration",
+        "properties": {
+          "gist-for-vscode.multi": {
+            "type": "boolean",
+            "default": false,
+            "description": "multi user"
+          }
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
