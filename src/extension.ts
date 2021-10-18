@@ -1,8 +1,8 @@
 import * as vscode from 'vscode'
 import createGistByFile from './utils/createGistByFile'
-import getAuthUserGists from './utils/getAuthUserGists'
 // import reload from './deprecate/reload'
-import rmGist from './utils/rmGist'
+import delGist from './utils/delGist'
+import getAuthUserGists from './utils/getAuthUserGists'
 import setToken from './utils/setToken'
 
 export function activate(context: vscode.ExtensionContext) {
@@ -23,8 +23,8 @@ export function activate(context: vscode.ExtensionContext) {
   )
 
   // 删除gist
-  let delGistHandle = vscode.commands.registerCommand('gist-vscode.delGist', file => {
-    rmGist(context)
+  let delGistHandle = vscode.commands.registerCommand('gist-vscode.delGist', () => {
+    delGist(context)
   })
   const subs = [pat, authUserList, createGistByFileHandle, delGistHandle]
   context.subscriptions.push(...subs)
