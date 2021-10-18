@@ -57,6 +57,4 @@ export default async (file: { fsPath: string }, context: vscode.ExtensionContext
       if (error.message === 'Token not set yet') setTokenTip(error)
       else vscode.window.showErrorMessage(error.message)
     }
-
-  // TODO: 删除.gist文件夹中的文件时，同时删除云端的gist
 }
