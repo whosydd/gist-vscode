@@ -1,3 +1,3 @@
 export interface File {
-  [key: string]: { gist_id: string; raw_url: string }
+  [key: string]: { filename: string; raw_url: string }
 }

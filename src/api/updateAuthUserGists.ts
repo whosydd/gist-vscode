@@ -33,9 +33,9 @@ export default async (
         let str: string
         // 判断是否存在desc
         if (desc?.trim() === '') str = filename
-        else str = `${filename} -- ${desc}`
+        else str = `${filename} - ${desc}   [${cur.id}]`
 
-        files.push({ [filename]: { gist_id: cur.id, raw_url } })
+        files.push({ [cur.id]: { filename, raw_url } })
 
         return [str, ...pre]
       }, [])
