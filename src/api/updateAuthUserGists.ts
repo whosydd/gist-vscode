@@ -27,13 +27,7 @@ export default async (
 
         if (filename === undefined || raw_url === undefined) throw new Error('Not found any file')
 
-        // 将数据组合成方便处理的字符串
-        const desc = cur.description
-
-        let str: string
-        // 判断是否存在desc
-        if (desc?.trim() === '') str = filename
-        else str = `${filename} - ${desc}   [${cur.id}]`
+        const str = `${filename}  |  ${cur.description}  |  ${cur.id}`
 
         files.push({ [cur.id]: { filename, raw_url } })
 

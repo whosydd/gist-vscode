@@ -31,18 +31,20 @@ export default async (file: any, context: vscode.ExtensionContext) => {
     n++
   }
 
-  const body = {
-    description,
-    // TODO: 还没有设定是公共还是私人
-    public: true,
-    files: {
-      [filename]: {
-        content,
-      },
-    },
-  }
-
   try {
+    if (description === undefined) throw new Error('')
+
+    const body = {
+      description,
+      // TODO: 还没有设定是公共还是私人
+      public: true,
+      files: {
+        [filename]: {
+          content,
+        },
+      },
+    }
+
     // 获取token
     const token: { default: string } | undefined = context.globalState.get('token')
     if (token === undefined) throw new Error('token not set yet')
@@ -54,6 +56,7 @@ export default async (file: any, context: vscode.ExtensionContext) => {
         else vscode.window.showErrorMessage('Failed!')
       })
   } catch (error: any) {
+    if (error.message === '') return
     setTokenTip(error)
   }
 }

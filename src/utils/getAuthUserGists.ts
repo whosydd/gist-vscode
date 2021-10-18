@@ -18,7 +18,7 @@ export default async (context: vscode.ExtensionContext) => {
     if (pickFile === undefined) return
 
     // 获取文件名和下载链接
-    const [filename, desc, gist_id] = pickFile.split(/ - |   \[|]/)
+    const [filename, desc, gist_id] = pickFile.split(/  \|  /)
     const pick = files.filter(file => Object.keys(file)[0] === gist_id)[0]
     const url = pick[gist_id].raw_url
 
@@ -49,8 +49,12 @@ export default async (context: vscode.ExtensionContext) => {
           } else if (value === `it's OK`) newFilename = filename
           else throw new Error('')
           fs.writeFileSync(`${location}/${newFilename}`, await download(url))
+          vscode.window.showInformationMessage('Done!')
         })
-    else fs.writeFileSync(`${location}/${filename}`, await download(url))
+    else {
+      fs.writeFileSync(`${location}/${filename}`, await download(url))
+      vscode.window.showInformationMessage('Done!')
+    }
 
     //#region
     // if (existFiles.length > 0) {
