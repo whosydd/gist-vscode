@@ -29,7 +29,7 @@
       },
       {
         "command": "gist-vscode.getAuthUserGists",
-        "title": "Gist: get user gists"
+        "title": "Gist: get gists"
       },
       {
         "command": "gist-vscode.createGistByFile",
@@ -38,7 +38,7 @@
       },
       {
         "command": "gist-vscode.delGist",
-        "title": "Gist: remove gist"
+        "title": "Gist: delete gist"
       }
     ],
     "menus": {
@@ -75,7 +75,7 @@
           "gist-for-vscode.multi": {
             "type": "boolean",
             "default": false,
-            "description": "multi user"
+            "description": "Now it's not working at all!"
           }
         }
       }
@@ -113,7 +113,6 @@
   },
   "dependencies": {
     "@octokit/rest": "^18.12.0",
-    "axios": "^0.23.0",
     "download": "^8.0.0"
   }
 }
