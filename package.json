@@ -18,7 +18,8 @@
     "onCommand:gist-vscode.setToken",
     "onCommand:gist-vscode.getAuthUserGists",
     "onCommand:gist-vscode.createGistByFile",
-    "onCommand:gist-vscode.delGist"
+    "onCommand:gist-vscode.delGist",
+    "onCommand:gist-vscode.getGistId"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -39,12 +40,20 @@
       {
         "command": "gist-vscode.delGist",
         "title": "Gist: delete gist"
+      },
+      {
+        "command": "gist-vscode.getGistId",
+        "title": "Gist: copy gist_id"
       }
     ],
     "menus": {
       "commandPalette": [
         {
           "command": "gist-vscode.createGistByFile",
+          "when": "null"
+        },
+        {
+          "command": "gist-vscode.getGistId",
           "when": "null"
         }
       ],
@@ -53,6 +62,16 @@
           "command": "gist-vscode.createGistByFile",
           "group": "2_workspace",
           "when": "filesExplorerFocus && !explorerResourceIsFolder && !inputFocus"
+        },
+        {
+          "command": "gist-vscode.delGist",
+          "group": "2_workspace",
+          "when": "resourceDirname =~ /.gist/"
+        },
+        {
+          "command": "gist-vscode.getGistId",
+          "group": "2_workspace",
+          "when": "resourceDirname =~ /.gist/"
         }
       ],
       "editor/context": [
