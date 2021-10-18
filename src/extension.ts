@@ -3,6 +3,8 @@ import createGistByFile from './utils/createGistByFile'
 import delGist from './utils/delGist'
 import getAuthUserGists from './utils/getAuthUserGists'
 import getGistId from './utils/getGistId'
+import getWorkspaceState from './utils/getWorkspaceState'
+import rmWorkspaceState from './utils/rmWorkspaceState'
 import setToken from './utils/setToken'
 
 export function activate(context: vscode.ExtensionContext) {
@@ -32,7 +34,31 @@ export function activate(context: vscode.ExtensionContext) {
     delGist(file, context)
   })
 
-  const subs = [pat, getAuthUserGistsHandle, getGistIdHandle, createGistByFileHandle, delGistHandle]
+  // 获取workspaceState中的数据并存储到.gist文件夹中
+  let getWorkspaceStateHandle = vscode.commands.registerCommand(
+    'gist-vscode.getWorkspaceState',
+    file => {
+      getWorkspaceState(file, context)
+    }
+  )
+
+  // 删除workspaceState中的数据
+  let rmWorkspaceStateHandle = vscode.commands.registerCommand(
+    'gist-vscode.rmWorkspaceState',
+    () => {
+      rmWorkspaceState(context)
+    }
+  )
+
+  const subs = [
+    pat,
+    getAuthUserGistsHandle,
+    getGistIdHandle,
+    createGistByFileHandle,
+    delGistHandle,
+    getWorkspaceStateHandle,
+    rmWorkspaceStateHandle,
+  ]
   context.subscriptions.push(...subs)
 }
 
