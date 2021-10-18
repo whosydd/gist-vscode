@@ -49,10 +49,16 @@ export default async (context: vscode.ExtensionContext) => {
           } else if (value === `it's OK`) newFilename = filename
           else throw new Error('')
           fs.writeFileSync(`${location}/${newFilename}`, await download(url))
+
+          context.workspaceState.update(newFilename, gist_id)
+
           vscode.window.showInformationMessage('Done!')
         })
     else {
       fs.writeFileSync(`${location}/${filename}`, await download(url))
+
+      context.workspaceState.update(filename, gist_id)
+
       vscode.window.showInformationMessage('Done!')
     }
 
