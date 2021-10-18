@@ -1,27 +1,26 @@
 import * as download from 'download'
 import * as fs from 'fs'
 import * as vscode from 'vscode'
-import path = require('path')
 import updateAuthUserGists from '../api/updateAuthUserGists'
+import path = require('path')
 
 export default async (context: vscode.ExtensionContext) => {
   try {
-    // context.workspaceState.update('gistId', undefined)
-
     // 获取最新gist列表
     const { files, pickList } = await updateAuthUserGists(context)
-    // workspace范围内保存映射（文件->gist_id），方便查询
-    // context.workspaceState.update('files', files)
 
-    const pickFile: string | undefined = await vscode.window.showQuickPick(pickList)
+    const pickFile: string | undefined = await vscode.window.showQuickPick(pickList, {
+      // TODO: 暂时还无法解决多个文件下载时的同名文件问题
+      canPickMany: false,
+    })
 
     // 出现选单时，未选择任何文件
     if (pickFile === undefined) return
 
-    const [filename, _] = pickFile.split(/ -- /)
-
-    const file = files.filter(item => Object.keys(item)[0] === filename)[0]
-    const url = Object.values(file)[0].raw_url
+    // 获取文件名和下载链接
+    const [filename, desc, gist_id] = pickFile.split(/ - |   \[|]/)
+    const pick = files.filter(file => Object.keys(file)[0] === gist_id)[0]
+    const url = pick[gist_id].raw_url
 
     // 不管工作区中添加了多少文件夹，都会保存在第一个文件夹中
     const workspace = vscode.workspace.workspaceFolders
@@ -43,9 +42,12 @@ export default async (context: vscode.ExtensionContext) => {
             let newName = await vscode.window.showInputBox({
               value: `${filename}`,
             })
-            if (newName !== undefined) newFilename = newName
+            const ext = filename.split('.').pop()
+            if (ext === undefined || newName === undefined) throw new Error('')
+            if (!newName.includes(ext)) newFilename = newName + '.' + ext
+            else newFilename = newName
           } else if (value === `it's OK`) newFilename = filename
-          else return
+          else throw new Error('')
           fs.writeFileSync(`${location}/${newFilename}`, await download(url))
         })
     else fs.writeFileSync(`${location}/${filename}`, await download(url))
