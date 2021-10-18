@@ -52,8 +52,16 @@ export default async (file: any, context: vscode.ExtensionContext) => {
     octokit(token.default)
       .rest.gists.create(body)
       .then(res => {
-        if (res.status === 201) vscode.window.showInformationMessage('Done!')
-        else vscode.window.showErrorMessage('Failed!')
+        if (res.status === 201) {
+          const gist_id = res.data.id
+          if (gist_id === undefined) throw new Error('')
+          vscode.window.showInformationMessage('Done!', 'Copy gist_id', 'Ignore').then(value => {
+            if (value === 'Copy gist_id') {
+              vscode.env.clipboard.writeText(gist_id)
+              vscode.window.showInformationMessage('Copied!')
+            } else throw new Error('')
+          })
+        } else vscode.window.showErrorMessage('Failed!')
       })
   } catch (error: any) {
     if (error.message === '') return
