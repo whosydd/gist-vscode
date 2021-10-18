@@ -19,7 +19,9 @@
     "onCommand:gist-vscode.getAuthUserGists",
     "onCommand:gist-vscode.createGistByFile",
     "onCommand:gist-vscode.delGist",
-    "onCommand:gist-vscode.getGistId"
+    "onCommand:gist-vscode.getGistId",
+    "onCommand:gist-vscode.getWorkspaceState",
+    "onCommand:gist-vscode.rmWorkspaceState"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -44,6 +46,14 @@
       {
         "command": "gist-vscode.getGistId",
         "title": "Gist: copy gist_id"
+      },
+      {
+        "command": "gist-vscode.getWorkspaceState",
+        "title": "Gist: get map"
+      },
+      {
+        "command": "gist-vscode.rmWorkspaceState",
+        "title": "Gist: remove map"
       }
     ],
     "menus": {
@@ -72,6 +82,16 @@
           "command": "gist-vscode.getGistId",
           "group": "2_workspace",
           "when": "resourceDirname =~ /.gist/"
+        },
+        {
+          "command": "gist-vscode.getWorkspaceState",
+          "group": "2_workspace",
+          "when": "resourcePath =~ /.gist/"
+        },
+        {
+          "command": "gist-vscode.rmWorkspaceState",
+          "group": "2_workspace",
+          "when": "resourcePath =~ /.gist/"
         }
       ],
       "editor/context": [
