@@ -1,11 +1,13 @@
 import * as vscode from 'vscode'
 import octokit from '../config/octokit'
-import { File } from '../config/types'
+import { QuickPickItem } from '../config/types'
 import { setTokenTip } from '../utils/tips'
 
 export default async (
-  context: vscode.ExtensionContext
-): Promise<{ files: File[]; pickList: string[] }> => {
+  context: vscode.ExtensionContext,
+  page: number,
+  per_page: number
+): Promise<QuickPickItem[]> => {
   return new Promise(async (resolve, reject) => {
     try {
       // 获取token
@@ -13,28 +15,27 @@ export default async (
       if (token === undefined) throw new Error('Token not set yet')
 
       // 发送请求获取gists列表
-      // TODO: per_page参数待定
-      const res = await octokit(token.default).rest.gists.list({ per_page: 10 })
+      const res = await octokit(token.default).rest.gists.list({ page, per_page })
 
       // 验证token有效性
       if (res.status !== 200) throw new Error('Token is invalid!')
 
-      let files: File[] = []
-
       // 将返回结果处理成可用数据
-      const pickList: string[] = res.data.reduce((pre: string[], cur) => {
+      const pickList = res.data.reduce((pre: QuickPickItem[], cur) => {
         const { filename, raw_url } = Object.values(cur.files).flat()[0]
 
         if (filename === undefined || raw_url === undefined) throw new Error('Not found any file')
 
-        const str = `${filename}  |  ${cur.description}  |  ${cur.id}`
-
-        files.push({ [cur.id]: { filename, raw_url } })
-
-        return [str, ...pre]
+        const pick: QuickPickItem = {
+          label: filename,
+          description: `${cur.description}`,
+          gist_id: cur.id,
+          raw_url,
+        }
+        return [pick, ...pre]
       }, [])
 
-      resolve({ files, pickList })
+      resolve(pickList)
     } catch (error: any) {
       if (error.message === 'Not found any file') vscode.window.showErrorMessage(error.message)
       else setTokenTip(error.message)
