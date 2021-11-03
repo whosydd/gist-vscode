@@ -18,9 +18,9 @@
     "onCommand:gist-vscode.setToken",
     "onCommand:gist-vscode.getAuthUserGists",
     "onCommand:gist-vscode.createGistByFile",
+    "onCommand:gist-vscode.createGistBySelect",
     "onCommand:gist-vscode.delGist",
     "onCommand:gist-vscode.getGistId",
-    "onCommand:gist-vscode.getWorkspaceState",
     "onCommand:gist-vscode.rmWorkspaceState"
   ],
   "main": "./dist/extension.js",
@@ -37,7 +37,14 @@
       {
         "command": "gist-vscode.createGistByFile",
         "title": "Gist: create gist",
-        "icon": "$(cloud-upload)"
+        "icon": {
+          "dark": "github.png",
+          "light": "github.png"
+        }
+      },
+      {
+        "command": "gist-vscode.createGistBySelect",
+        "title": "Gist: create gist"
       },
       {
         "command": "gist-vscode.delGist",
@@ -48,12 +55,8 @@
         "title": "Gist: copy gist_id"
       },
       {
-        "command": "gist-vscode.getWorkspaceState",
-        "title": "Gist: get map"
-      },
-      {
         "command": "gist-vscode.rmWorkspaceState",
-        "title": "Gist: remove map"
+        "title": "Gist: remove local cache"
       }
     ],
     "menus": {
@@ -63,7 +66,15 @@
           "when": "null"
         },
         {
+          "command": "gist-vscode.createGistBySelect",
+          "when": "null"
+        },
+        {
           "command": "gist-vscode.getGistId",
+          "when": "null"
+        },
+        {
+          "command": "gist-vscode.rmWorkspaceState",
           "when": "null"
         }
       ],
@@ -84,20 +95,16 @@
           "when": "resourceDirname =~ /.gist/"
         },
         {
-          "command": "gist-vscode.getWorkspaceState",
-          "group": "2_workspace",
-          "when": "resourcePath =~ /.gist/"
-        },
-        {
           "command": "gist-vscode.rmWorkspaceState",
           "group": "2_workspace",
-          "when": "resourcePath =~ /.gist/"
+          "when": "resourcePath =~ /.gist/ && explorerResourceIsFolder"
         }
       ],
       "editor/context": [
         {
-          "command": "gist-vscode.createGistByFile",
-          "group": "0_modification"
+          "command": "gist-vscode.createGistBySelect",
+          "group": "0_modification",
+          "when": "editorHasSelection"
         }
       ],
       "editor/title": [
@@ -115,6 +122,11 @@
             "type": "boolean",
             "default": false,
             "description": "Now it's not working at all!"
+          },
+          "gist-for-vscode.per_page": {
+            "type": "number",
+            "default": 30,
+            "description": "Data per request"
           }
         }
       }
