@@ -4,7 +4,7 @@ import octokit from '../config/octokit'
 import { setTokenTip } from './tips'
 import path = require('path')
 
-export default async (file: any, context: vscode.ExtensionContext) => {
+export default async (file: { fsPath: string }, context: vscode.ExtensionContext) => {
   // 获取文件
   const filePath = file.fsPath
 
@@ -32,7 +32,7 @@ export default async (file: any, context: vscode.ExtensionContext) => {
   }
 
   try {
-    if (description === undefined) throw new Error('')
+    if (description === undefined || filename === undefined) throw new Error('')
 
     const body = {
       description,
@@ -55,11 +55,11 @@ export default async (file: any, context: vscode.ExtensionContext) => {
         if (res.status === 201) {
           const gist_id = res.data.id
           if (gist_id === undefined) throw new Error('')
-          vscode.window.showInformationMessage('Done!', 'Copy gist_id', 'Ignore').then(value => {
+          vscode.window.showInformationMessage('Done!', 'Copy gist_id').then(value => {
             if (value === 'Copy gist_id') {
               vscode.env.clipboard.writeText(gist_id)
               vscode.window.showInformationMessage('Copied!')
-            } else throw new Error('')
+            } else return
           })
         } else vscode.window.showErrorMessage('Failed!')
       })
