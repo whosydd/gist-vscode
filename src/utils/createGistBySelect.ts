@@ -23,23 +23,38 @@ export default async (file: { fsPath: string }, context: vscode.ExtensionContext
     const filePath = file.fsPath
 
     // 文件名
-    const filename = filePath.split(path.sep).pop()!
+    const tmpName = filePath.split(path.sep).pop()!
+    const filename = await vscode.window.showInputBox({
+      title: 'Gist: create a gist',
+      value: tmpName,
+    })
+    if (!filename) return
+    let newFilename: string
+    const ext = tmpName.split('.').pop()!
+    if (!filename.includes(ext)) newFilename = filename + '.' + ext
+    else newFilename = filename
+    if (!newFilename.includes('.')) throw new Error('Please set file extension')
     // 文件内容
-    const content = fs.readFileSync(filePath, 'utf-8')
+    const content = code
     // 文件描述
     const description = await vscode.window.showInputBox({
       title: 'Gist: create a gist',
-      value: `Description for ${filename}`,
+      value: `Description for ${newFilename}`,
     })
-
     if (!description) return
+
+    // public or private
+    const flag = await vscode.window.showQuickPick([
+      { label: 'public', value: true },
+      { label: 'private', value: false },
+    ])
+    if (!flag) return
 
     const body = {
       description,
-      // TODO: 还没有设定是公共还是私人
-      public: true,
+      public: flag.value,
       files: {
-        [filename]: {
+        [newFilename]: {
           content,
         },
       },

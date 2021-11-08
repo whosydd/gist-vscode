@@ -14,17 +14,22 @@ export default async (file: { fsPath: string }, context: vscode.ExtensionContext
     // 文件内容
     const content = fs.readFileSync(filePath, 'utf-8')
     // 文件描述
-    let description = await vscode.window.showInputBox({
+    const description = await vscode.window.showInputBox({
       title: 'Gist: create a gist',
       value: `Description for ${filename}`,
     })
-
     if (!description) return
+
+    // public or private
+    const flag = await vscode.window.showQuickPick([
+      { label: 'public', value: true },
+      { label: 'private', value: false },
+    ])
+    if (!flag) return
 
     const body = {
       description,
-      // TODO: 还没有设定是公共还是私人
-      public: true,
+      public: flag.value,
       files: {
         [filename]: {
           content,
