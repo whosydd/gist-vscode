@@ -53,8 +53,8 @@ export default async (file: { fsPath: string }, context: vscode.ExtensionContext
         rmList.forEach(pick => {
           const { label, description, gist_id, raw_url } = pick as QuickPickItem
           if (gist_id) octokit(token.default).rest.gists.delete({ gist_id })
-          vscode.window.showInformationMessage('Done!')
         })
+        vscode.window.showInformationMessage('Done!')
       })
 
       // TODO: 备份gist（将删除的gist暂时保存在context.workspaceState中，防止后悔）
