@@ -8,14 +8,11 @@ import { setTokenTip } from './tips'
 
 export default async (file: { fsPath: string }, context: vscode.ExtensionContext) => {
   // 命令删除
-  if (file === undefined)
+  if (!file)
     try {
       let page = 1
       // 获取per_page的配置项
-      let per_page: number | undefined = vscode.workspace
-        .getConfiguration('gist-for-vscode')
-        .get('per_page')
-      if (per_page === undefined) throw new Error('')
+      let per_page: number = vscode.workspace.getConfiguration('gist-for-vscode').get('per_page')!
 
       const quickPick = vscode.window.createQuickPick()
       quickPick.canSelectMany = true
@@ -28,21 +25,19 @@ export default async (file: { fsPath: string }, context: vscode.ExtensionContext
 
       quickPick.show()
 
-      // 异步加载
+      // 获取更多
       quickPick.onDidChangeSelection(async item => {
-        if (per_page === undefined) throw new Error('')
-        if (item[0])
-          if (item[0].label === 'More...') {
-            quickPick.busy = true
-            page++
-            const tmp = [...quickPick.items]
-            const pickList = await updateAuthUserGists(context, page, per_page)
-            const newList = (pickList as vscode.QuickPickItem[]).concat(tmp.slice(1))
-            quickPick.items = [more, ...newList]
-            quickPick.busy = false
+        if (item[0].label === 'More...') {
+          quickPick.busy = true
+          page++
+          const tmp = [...quickPick.items]
+          const pickList = await updateAuthUserGists(context, page, per_page)
+          const newList = (pickList as vscode.QuickPickItem[]).concat(tmp.slice(1))
+          quickPick.items = [more, ...newList]
+          quickPick.busy = false
 
-            if (pickList.length < per_page) quickPick.items = [...newList]
-          } else return
+          if (pickList.length < per_page) quickPick.items = [...newList]
+        } else return
       })
 
       // 生成rmlist
@@ -50,10 +45,9 @@ export default async (file: { fsPath: string }, context: vscode.ExtensionContext
         quickPick.dispose()
         const rmList = quickPick.selectedItems
 
-        // TODO: 暂时还无法解决多个同名文件下载时的问题
         // 获取token
         const token: { default: string } | undefined = context.globalState.get('token')
-        if (token === undefined) throw new Error('Token not set yet')
+        if (!token) throw new Error('Token not set yet')
 
         // 发送请求
         rmList.forEach(pick => {
@@ -71,15 +65,14 @@ export default async (file: { fsPath: string }, context: vscode.ExtensionContext
   // 资源管理器中删除
   else
     try {
-      const filename = file.fsPath.split(path.sep).pop()
-      if (filename === undefined) throw new Error(`Not found ${filename}!`)
+      const filename = file.fsPath.split(path.sep).pop()!
 
       const gist_id: string | undefined = context.workspaceState.get(filename)
-      if (gist_id === undefined) throw new Error(`Not found gist_id of ${filename} in local cache!`)
+      if (!gist_id) throw new Error(`Not found gist_id of ${filename} in local cache!`)
 
       // 获取token
       const token: { default: string } | undefined = context.globalState.get('token')
-      if (token === undefined) throw new Error('Token not set yet')
+      if (!token) throw new Error('Token not set yet')
       // 发送请求
       octokit(token.default).rest.gists.delete({ gist_id })
       // 删除文件

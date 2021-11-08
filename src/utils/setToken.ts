@@ -11,7 +11,7 @@ export default async (context: vscode.ExtensionContext) => {
     value: 'Please enter <Personal access tokens> from https://github.com/settings/tokens',
   })
   try {
-    if (token === undefined) throw new Error('Setting has not been completed!')
+    if (!token) throw new Error('Setting has not been completed!')
 
     if (token === '') throw new Error('Nothing entered!')
 

@@ -12,7 +12,7 @@ export default async (
     try {
       // 获取token
       const token: { default: string } | undefined = context.globalState.get('token')
-      if (token === undefined) throw new Error('Token not set yet')
+      if (!token) throw new Error('Token not set yet')
 
       // 发送请求获取gists列表
       const res = await octokit(token.default).rest.gists.list({ page, per_page })
@@ -24,7 +24,7 @@ export default async (
       const pickList = res.data.reduce((pre: QuickPickItem[], cur) => {
         const { filename, raw_url } = Object.values(cur.files).flat()[0]
 
-        if (filename === undefined || raw_url === undefined) throw new Error('Not found any file')
+        if (!filename || !raw_url) throw new Error('Not found any file')
 
         const pick: QuickPickItem = {
           label: filename,

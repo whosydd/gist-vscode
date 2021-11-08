@@ -5,34 +5,21 @@ import { setTokenTip } from './tips'
 import path = require('path')
 
 export default async (file: { fsPath: string }, context: vscode.ExtensionContext) => {
-  // 获取文件
-  const filePath = file.fsPath
+  try {
+    // 获取文件
+    const filePath = file.fsPath
 
-  // 文件名
-  const filename = filePath.split(path.sep).pop()
-  // 文件内容
-  const content = fs.readFileSync(filePath, 'utf-8')
-  // 文件描述
-  const description = await vscode.window.showInputBox({
-    title: 'Gist: create a gist',
-    value: `Description for ${filename}`,
-  })
-
-  // 判断是否手快没改描述
-  let n = 0
-  while (description === `Description for ${filename}` && n < 3) {
-    vscode.window.showWarningMessage(
-      `Don't use this~${n === 2 ? '  Important things need to be repeated for three times!!!' : ''}`
-    )
-    await vscode.window.showInputBox({
-      title: 'Gist: create gist',
+    // 文件名
+    const filename = filePath.split(path.sep).pop()!
+    // 文件内容
+    const content = fs.readFileSync(filePath, 'utf-8')
+    // 文件描述
+    let description = await vscode.window.showInputBox({
+      title: 'Gist: create a gist',
       value: `Description for ${filename}`,
     })
-    n++
-  }
 
-  try {
-    if (description === undefined || filename === undefined) throw new Error('')
+    if (!description) return
 
     const body = {
       description,
@@ -47,14 +34,13 @@ export default async (file: { fsPath: string }, context: vscode.ExtensionContext
 
     // 获取token
     const token: { default: string } | undefined = context.globalState.get('token')
-    if (token === undefined) throw new Error('token not set yet')
+    if (!token) throw new Error('token not set yet')
     // 发送请求
     octokit(token.default)
       .rest.gists.create(body)
       .then(res => {
         if (res.status === 201) {
-          const gist_id = res.data.id
-          if (gist_id === undefined) throw new Error('')
+          const gist_id = res.data.id!
           vscode.window.showInformationMessage('Done!', 'Copy gist_id').then(value => {
             if (value === 'Copy gist_id') {
               vscode.env.clipboard.writeText(gist_id)
@@ -64,7 +50,6 @@ export default async (file: { fsPath: string }, context: vscode.ExtensionContext
         } else vscode.window.showErrorMessage('Failed!')
       })
   } catch (error: any) {
-    if (error.message === '') return
     setTokenTip(error)
   }
 }
