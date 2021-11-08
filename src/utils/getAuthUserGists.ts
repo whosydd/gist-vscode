@@ -45,19 +45,28 @@ export default async (context: vscode.ExtensionContext) => {
 
           if (gist_id === undefined || raw_url === undefined) throw new Error('')
 
-          // 不管工作区中添加了多少文件夹，都会保存在第一个文件夹中
+          // 获取工作区目录
+          let rootPath = ''
           const workspace = vscode.workspace.workspaceFolders
           if (workspace === undefined) throw new Error('Please open a workspace')
-          const rootDir = workspace[0].uri.fsPath
+          // 如果工作区中存在的多个文件夹，显示选择框
+          if (workspace.length > 1) {
+            const pick = await vscode.window.showWorkspaceFolderPick()
+            if (!pick) throw new Error('')
+            rootPath = pick.uri.fsPath
+          } else {
+            const pick = workspace[0]
+            rootPath = pick.uri.fsPath
+          }
 
           // 保证文件夹存在
-          const location = path.resolve(rootDir, '.gist')
+          const location = path.resolve(rootPath, '.gist')
           if (!fs.existsSync(location)) fs.mkdirSync(location)
 
           // 如果本地已存在同名文件，提示改名
           let newFilename: string
-          const existFiles = await vscode.workspace.findFiles(`.gist/${label}`)
-          if (existFiles.length > 0)
+          const existFile = fs.existsSync(`${rootPath}/.gist/${label}`)
+          if (existFile)
             vscode.window
               .showWarningMessage(`${label} already existed!`, 'Rename', 'Replace')
               .then(async value => {
