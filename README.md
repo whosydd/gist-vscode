@@ -13,23 +13,24 @@
 - 在创建`gist`后，提示是否将`gist_id`复制到剪贴板
 - 如果`.gist`文件夹中的文件找不到`gist_id`，会提示是否为当前文件创建 gist
 - 从选中代码创建 gist
-- 新的命令，可以删除`workspaceState`中缓存的数据
-- 添加配置项，设置`per_page`，默认30
+- 新的命令，右键`.gist`文件夹，可以删除`workspaceState`中缓存的数据
+- 添加配置项，设置`per_page`，默认 30
 - `quickPick`列表实现异步加载，根据`per_page`动态请求数据
-- 创建gist时，提供可选的`public`和`private`
+- 创建 gist 时，提供可选的`public`和`private`
+- 新命令，右键`.gist`文件夹，浏览器中打开 gists
 
 ### TODO:
 
-- 一次获取多个gist（同名文件暂时还没想到怎么处理，暂时放弃）
+- 一次获取多个 gist（同名文件暂时还没想到怎么处理，暂时放弃）
 - 多用户配置暂时感觉没必要，以后迭代的时候再考虑
 - 编辑 gist
   - 实现 1：下载到缓存区再编辑，保存后推送到 gist
-  - 实现 2：使用 webview 直接打开独立面板 (官方文档表示能不用尽量别用webview，故暂时放弃)
+  - 实现 2：使用 webview 直接打开独立面板 (官方文档表示能不用尽量别用 webview，故暂时放弃)
 - 评论相关的所有功能（感觉没必要，暂时放弃）
 - 有关删除 gist 的行为，考虑要不要添加备份功能，防止误操作
 - star gist & unstar gist
-- 获取公共gists
-- 获取starred gists
-- 获取forked gists
-- 获取指定用户gists
+- 获取公共 gists
+- 获取 starred gists
+- 获取 forked gists
+- 获取指定用户 gists
 - 可以使用`alt+click`的方式执行一些不常用的命令，但也有局限性，只能出现在部分菜单中
