@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
 import octokit from '../config/octokit'
 import { QuickPickItem } from '../config/types'
-import { setTokenTip } from '../utils/tips'
+import { setTokenTip } from './tips'
 
 export default async (
   context: vscode.ExtensionContext,
@@ -19,6 +19,9 @@ export default async (
 
       // 验证token有效性
       if (res.status !== 200) throw new Error('Token is invalid!')
+
+      // 保存当前用户信息
+      context.globalState.update('user', res.data[0].owner)
 
       // 将返回结果处理成可用数据
       const pickList = res.data.reduce((pre: QuickPickItem[], cur) => {

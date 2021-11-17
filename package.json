@@ -21,7 +21,8 @@
     "onCommand:gist-vscode.createGistBySelect",
     "onCommand:gist-vscode.delGist",
     "onCommand:gist-vscode.getGistId",
-    "onCommand:gist-vscode.rmWorkspaceState"
+    "onCommand:gist-vscode.rmWorkspaceState",
+    "onCommand:gist-vscode.openInBrowser"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -57,6 +58,10 @@
       {
         "command": "gist-vscode.rmWorkspaceState",
         "title": "Gist: remove local cache"
+      },
+      {
+        "command": "gist-vscode.openInBrowser",
+        "title": "Gist: open in browser"
       }
     ],
     "menus": {
@@ -75,6 +80,10 @@
         },
         {
           "command": "gist-vscode.rmWorkspaceState",
+          "when": "null"
+        },
+        {
+          "command": "gist-vscode.openInBrowser",
           "when": "null"
         }
       ],
@@ -96,6 +105,11 @@
         },
         {
           "command": "gist-vscode.rmWorkspaceState",
+          "group": "2_workspace",
+          "when": "resourcePath =~ /.gist/ && explorerResourceIsFolder"
+        },
+        {
+          "command": "gist-vscode.openInBrowser",
           "group": "2_workspace",
           "when": "resourcePath =~ /.gist/ && explorerResourceIsFolder"
         }

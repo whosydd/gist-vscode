@@ -4,6 +4,7 @@ import createGistBySelect from './utils/createGistBySelect'
 import delGist from './utils/delGist'
 import getAuthUserGists from './utils/getAuthUserGists'
 import getGistId from './utils/getGistId'
+import openInBrowser from './utils/openInBrowser'
 import rmWorkspaceState from './utils/rmWorkspaceState'
 import setToken from './utils/setToken'
 
@@ -51,6 +52,11 @@ export function activate(context: vscode.ExtensionContext) {
     }
   )
 
+  // 浏览器打开gists
+  let openInBrowserHandler = vscode.commands.registerCommand('gist-vscode.openInBrowser', () =>
+    openInBrowser(context)
+  )
+
   const subs = [
     patHandler,
     getAuthUserGistsHandler,
@@ -59,6 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
     createGistBySelectHandler,
     delGistHandler,
     rmWorkspaceStateHandler,
+    openInBrowserHandler,
   ]
   context.subscriptions.push(...subs)
 }
