@@ -1,7 +1,7 @@
 import path = require('path')
 import * as fs from 'fs'
 import * as vscode from 'vscode'
-import updateAuthUserGists from '../api/updateAuthUserGists'
+import updateAuthUserGists from './updateAuthUserGists'
 import octokit from '../config/octokit'
 import { QuickPickItem } from '../config/types'
 import { setTokenTip } from './tips'
