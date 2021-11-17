@@ -1,8 +1,8 @@
 import * as download from 'download'
 import * as fs from 'fs'
 import * as vscode from 'vscode'
-import updateAuthUserGists from '../api/updateAuthUserGists'
 import { QuickPickItem } from '../config/types'
+import updateAuthUserGists from './updateAuthUserGists'
 import path = require('path')
 
 export default async (context: vscode.ExtensionContext) => {
@@ -22,70 +22,72 @@ export default async (context: vscode.ExtensionContext) => {
     quickPick.show()
 
     quickPick.onDidChangeSelection(async item => {
-      if (item[0].label === 'More...') {
-        quickPick.busy = true
-        page++
-        const tmp = [...quickPick.items]
-        const pickList = await updateAuthUserGists(context, page, per_page)
-        const newList = (pickList as vscode.QuickPickItem[]).concat(tmp.slice(1))
-        quickPick.items = [more, ...newList]
-        quickPick.busy = false
+      if (item.length > 0)
+        if (item[0].label === 'More...') {
+          quickPick.busy = true
+          page++
+          const tmp = [...quickPick.items]
+          const pickList = await updateAuthUserGists(context, page, per_page)
+          const newList = (pickList as vscode.QuickPickItem[]).concat(tmp.slice(1))
+          quickPick.items = [more, ...newList]
+          quickPick.busy = false
 
-        if (pickList.length < per_page) quickPick.items = [...newList]
-      } else {
-        quickPick.dispose()
-        // 获取文件名和下载链接
-        const { label, description, gist_id, raw_url } = (item as QuickPickItem[])[0]
-
-        // 获取工作区目录
-        let rootPath = ''
-        const workspace = vscode.workspace.workspaceFolders
-        if (!workspace) throw new Error('Please open a workspace')
-        // 如果工作区中存在的多个文件夹，显示选择框
-        if (workspace.length > 1) {
-          const pick = await vscode.window.showWorkspaceFolderPick()
-          if (!pick) return
-          rootPath = pick.uri.fsPath
+          if (pickList.length < per_page) quickPick.items = [...newList]
         } else {
-          const pick = workspace[0]
-          rootPath = pick.uri.fsPath
+          quickPick.dispose()
+
+          // 获取文件名和下载链接
+          const { label, description, gist_id, raw_url } = (item as QuickPickItem[])[0]
+
+          // 获取工作区目录
+          let rootPath = ''
+          const workspace = vscode.workspace.workspaceFolders
+          if (!workspace) throw new Error('Please open a workspace')
+          // 如果工作区中存在的多个文件夹，显示选择框
+          if (workspace.length > 1) {
+            const pick = await vscode.window.showWorkspaceFolderPick()
+            if (!pick) return
+            rootPath = pick.uri.fsPath
+          } else {
+            const pick = workspace[0]
+            rootPath = pick.uri.fsPath
+          }
+
+          // 保证文件夹存在
+          const location = path.resolve(rootPath, '.gist')
+          if (!fs.existsSync(location)) fs.mkdirSync(location)
+
+          // 如果本地已存在同名文件，提示改名
+          let newFilename: string
+          const existFile = fs.existsSync(`${rootPath}/.gist/${label}`)
+          if (existFile)
+            vscode.window
+              .showWarningMessage(`${label} already existed!`, 'Rename', 'Replace')
+              .then(async value => {
+                if (value === 'Rename') {
+                  let newName = await vscode.window.showInputBox({
+                    value: `${label}`,
+                  })
+                  const ext = label.split('.').pop()
+                  if (!ext || !newName) return
+                  if (!newName.includes(ext)) newFilename = newName + '.' + ext
+                  else newFilename = newName
+                } else if (value === `Replace`) newFilename = label
+                else return
+                fs.writeFileSync(`${location}/${newFilename}`, await download(raw_url))
+
+                context.workspaceState.update(newFilename, gist_id)
+
+                vscode.window.showInformationMessage('Done!')
+              })
+          else {
+            fs.writeFileSync(`${location}/${label}`, await download(raw_url))
+
+            context.workspaceState.update(label, gist_id)
+
+            vscode.window.showInformationMessage('Done!')
+          }
         }
-
-        // 保证文件夹存在
-        const location = path.resolve(rootPath, '.gist')
-        if (!fs.existsSync(location)) fs.mkdirSync(location)
-
-        // 如果本地已存在同名文件，提示改名
-        let newFilename: string
-        const existFile = fs.existsSync(`${rootPath}/.gist/${label}`)
-        if (existFile)
-          vscode.window
-            .showWarningMessage(`${label} already existed!`, 'Rename', 'Replace')
-            .then(async value => {
-              if (value === 'Rename') {
-                let newName = await vscode.window.showInputBox({
-                  value: `${label}`,
-                })
-                const ext = label.split('.').pop()
-                if (!ext || !newName) return
-                if (!newName.includes(ext)) newFilename = newName + '.' + ext
-                else newFilename = newName
-              } else if (value === `Replace`) newFilename = label
-              else return
-              fs.writeFileSync(`${location}/${newFilename}`, await download(raw_url))
-
-              context.workspaceState.update(newFilename, gist_id)
-
-              vscode.window.showInformationMessage('Done!')
-            })
-        else {
-          fs.writeFileSync(`${location}/${label}`, await download(raw_url))
-
-          context.workspaceState.update(label, gist_id)
-
-          vscode.window.showInformationMessage('Done!')
-        }
-      }
     })
   } catch (error: any) {
     vscode.window.showErrorMessage(error.message)
