@@ -1,12 +1,12 @@
 import path = require('path')
 import * as fs from 'fs'
 import * as vscode from 'vscode'
-import updateAuthUserGists from './updateAuthUserGists'
 import octokit from '../config/octokit'
 import { QuickPickItem } from '../config/types'
 import { setTokenTip } from './tips'
+import updateAuthUserGists from './updateAuthUserGists'
 
-export default async (file: { fsPath: string }, context: vscode.ExtensionContext) => {
+export default async (file: vscode.Uri, context: vscode.ExtensionContext) => {
   // 命令删除
   if (!file)
     try {
