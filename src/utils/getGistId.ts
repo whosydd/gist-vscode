@@ -2,7 +2,7 @@ import path = require('path')
 import * as vscode from 'vscode'
 import createGistByFile from './createGistByFile'
 
-export default async (file: { fsPath: string }, context: vscode.ExtensionContext) => {
+export default async (file: vscode.Uri, context: vscode.ExtensionContext) => {
   try {
     const filename = file.fsPath.split(path.sep).pop()!
 

@@ -4,7 +4,7 @@ import octokit from '../config/octokit'
 import { setTokenTip } from './tips'
 import path = require('path')
 
-export default async (file: { fsPath: string }, context: vscode.ExtensionContext) => {
+export default async (file: vscode.Uri, context: vscode.ExtensionContext) => {
   try {
     // 获取文件
     const filePath = file.fsPath
