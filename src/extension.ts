@@ -26,30 +26,24 @@ export function activate(context: vscode.ExtensionContext) {
   // 创建gist - 文件
   let createGistByFileHandler = vscode.commands.registerCommand(
     'gist-vscode.createGistByFile',
-    file => {
-      createGistByFile(file, context)
-    }
+    file => createGistByFile(file, context)
   )
 
   // 创建gist - 代码
   let createGistBySelectHandler = vscode.commands.registerCommand(
     'gist-vscode.createGistBySelect',
-    file => {
-      createGistBySelect(file, context)
-    }
+    file => createGistBySelect(file, context)
   )
 
   // 删除gist
-  let delGistHandler = vscode.commands.registerCommand('gist-vscode.delGist', file => {
+  let delGistHandler = vscode.commands.registerCommand('gist-vscode.delGist', file =>
     delGist(file, context)
-  })
+  )
 
   // 删除workspaceState中的数据
   let rmWorkspaceStateHandler = vscode.commands.registerCommand(
     'gist-vscode.rmWorkspaceState',
-    () => {
-      rmWorkspaceState(context)
-    }
+    () => rmWorkspaceState(context)
   )
 
   // 浏览器打开gists
