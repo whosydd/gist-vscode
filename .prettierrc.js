@@ -13,6 +13,6 @@ module.exports = {
   proseWrap: 'preserve', // markdown wrap
   htmlWhitespaceSensitivity: 'css', // html空格敏感度
   vueIndentScriptAndStyle: false, // vue中缩进script和style标签
-  endOfLine: 'lf', // 行尾换行
   embeddedLanguageFormatting: 'auto', // 格式化嵌入代码
+  endOfLine: 'lf', // 行尾换行
 }
