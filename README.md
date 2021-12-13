@@ -34,3 +34,6 @@
 - 获取 forked gists
 - 获取指定用户 gists
 - 可以使用`alt+click`的方式执行一些不常用的命令，但也有局限性，只能出现在部分菜单中
+- 在最新的 1.63 版本中，可以在`quickpick`中添加按钮 参考：https://code.visualstudio.com/updates/v1_63
+  - 将评论、star、编辑、删除、fork 等功能集成到按钮中
+- 同上，可以保持列表刷新时的滚动位置，该功能可以在更新 gist 列表时派上用场
