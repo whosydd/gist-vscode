@@ -2,7 +2,7 @@
   "name": "gist-vscode",
   "displayName": "Gist for VS Code",
   "description": "generate code from gist",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.73.0"
   },
@@ -16,8 +16,35 @@
   "contributes": {
     "commands": [
       {
-        "command": "gist-vscode.helloWorld",
-        "title": "Hello World"
+        "command": "gist-vscode.setToken",
+        "title": "set token",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.showAuthGists",
+        "title": "list gists for authenticated user",
+        "category": "Gist"
+      }
+    ],
+    "configuration": [
+      {
+        "title": "Gist for VSCode: configuration",
+        "properties": {
+          "gist-vscode.token": {
+            "type": "string",
+            "description": "<Personal access tokens> from https://github.com/settings/tokens"
+          },
+          "gist-vscode.multi": {
+            "type": "boolean",
+            "default": false,
+            "description": "Now it's not working at all!"
+          },
+          "gist-vscode.per_page": {
+            "type": "number",
+            "default": 30,
+            "description": "Data per request."
+          }
+        }
       }
     ]
   },
@@ -33,6 +60,7 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@octokit/types": "^8.0.0",
     "@types/glob": "^8.0.0",
     "@types/mocha": "^10.0.0",
     "@types/node": "16.x",
