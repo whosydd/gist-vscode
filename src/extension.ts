@@ -7,7 +7,7 @@ export function activate(context: vscode.ExtensionContext) {
   const setToken = vscode.commands.registerCommand('gist-vscode.setToken', () => setTokenHandler())
 
   const showAuthGists = vscode.commands.registerCommand('gist-vscode.showAuthGists', () =>
-    showAuthGistsHandler()
+    showAuthGistsHandler(context)
   )
 
   const list = [setToken, showAuthGists]

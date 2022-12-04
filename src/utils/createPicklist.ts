@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest'
 import { commands, ThemeIcon, workspace } from 'vscode'
-import { showAuthGists } from './ajax'
+import { showAuthGists, showPublicGists } from './ajax'
 import { ButtonTip, GistButtons, GistQuickPickItem, ListAuthGistsRes, ReqType } from './types'
 
 const token: string | undefined = workspace.getConfiguration('gist-vscode').get('token')
@@ -23,8 +23,8 @@ export default async (
     case ReqType.SHOW_AUTH_GISTS:
       res = await showAuthGists(octokit, page, per_page)
       break
-    // case ReqType.SHOW_PUBLIC_GISTS:
-    //   res = await showPublicGists(octokit, page, per_page)
+    case ReqType.SHOW_PUBLIC_GISTS:
+      res = await showPublicGists(octokit, page, per_page)
     default:
       break
   }

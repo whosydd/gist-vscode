@@ -16,9 +16,9 @@ export const showForkedGists = () => {
 }
 
 // show public gists
-// export const showPublicGists = (octokit: Octokit, page: number, per_page: number) => {
-//   return octokit.rest.gists.listPublic({ page, per_page })
-// }
+export const showPublicGists = (octokit: Octokit, page: number, per_page: number) => {
+  return octokit.rest.gists.listPublic({ page, per_page })
+}
 
 // 显示其他用户的 public gists
 export const showUserPublicGists = () => {
