@@ -26,6 +26,14 @@
         "category": "Gist"
       }
     ],
+    "menus": {
+      "editor/title": [],
+      "explorer/context": [
+        {
+          "command": "gist-vscode.showAuthGists"
+        }
+      ]
+    },
     "configuration": [
       {
         "title": "Gist for VSCode: configuration",
@@ -61,6 +69,7 @@
   },
   "devDependencies": {
     "@octokit/types": "^8.0.0",
+    "@types/download": "^8.0.1",
     "@types/glob": "^8.0.0",
     "@types/mocha": "^10.0.0",
     "@types/node": "16.x",

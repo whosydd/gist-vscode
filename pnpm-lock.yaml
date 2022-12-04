@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@octokit/rest': ^19.0.5
   '@octokit/types': ^8.0.0
+  '@types/download': ^8.0.1
   '@types/glob': ^8.0.0
   '@types/mocha': ^10.0.0
   '@types/node': 16.x
@@ -26,6 +27,7 @@ dependencies:
 
 devDependencies:
   '@octokit/types': 8.0.0
+  '@types/download': 8.0.1
   '@types/glob': 8.0.0
   '@types/mocha': 10.0.1
   '@types/node': 16.18.4
@@ -268,6 +270,20 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
+  /@types/decompress/4.2.4:
+    resolution: {integrity: sha512-/C8kTMRTNiNuWGl5nEyKbPiMv6HA+0RbEXzFhFBEzASM6+oa4tJro9b8nj7eRlOFfuLdzUU+DS/GPDlvvzMOhA==}
+    dependencies:
+      '@types/node': 16.18.4
+    dev: true
+
+  /@types/download/8.0.1:
+    resolution: {integrity: sha512-t5DjMD6Y1DxjXtEHl7Kt+nQn9rOmVLYD8p4Swrcc5QpgyqyqR2gXTIK6RwwMnNeFJ+ZIiIW789fQKzCrK7AOFA==}
+    dependencies:
+      '@types/decompress': 4.2.4
+      '@types/got': 8.3.6
+      '@types/node': 16.18.4
+    dev: true
+
   /@types/eslint-scope/3.7.4:
     resolution: {integrity: sha512-9K4zoImiZc3HlIp6AVUDE4CWYx22a+lhSZMYNpbjW04+YF0KWj4pJXnEMjdnFTiQibFFmElcsasJXDbdI/EPhA==}
     dependencies:
@@ -290,6 +306,12 @@ packages:
     resolution: {integrity: sha512-l6NQsDDyQUVeoTynNpC9uRvCUint/gSUXQA2euwmTuWGvPY5LSDUu6tkCtJB2SvGQlJQzLaKqcGZP4//7EDveA==}
     dependencies:
       '@types/minimatch': 5.1.2
+      '@types/node': 16.18.4
+    dev: true
+
+  /@types/got/8.3.6:
+    resolution: {integrity: sha512-nvLlj+831dhdm4LR2Ly+HTpdLyBaMynoOr6wpIxS19d/bPeHQxFU5XQ6Gp6ohBpxvCWZM1uHQIC2+ySRH1rGrQ==}
+    dependencies:
       '@types/node': 16.18.4
     dev: true
 
