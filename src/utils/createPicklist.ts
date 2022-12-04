@@ -23,7 +23,8 @@ export default async (
     case ReqType.SHOW_AUTH_GISTS:
       res = await showAuthGists(octokit, page, per_page)
       break
-
+    // case ReqType.SHOW_PUBLIC_GISTS:
+    //   res = await showPublicGists(octokit, page, per_page)
     default:
       break
   }
