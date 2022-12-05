@@ -63,12 +63,14 @@ export const ajaxCreateGist = (files: CreateGistParams) => {
   return octokit.rest.gists.create(files)
 }
 
-// update
-export const updateGist = () => {
-  console.log('修改gist')
-}
+// // update
+// export const updateGist = () => {
+//   console.log('修改gist')
+// }
 
 // delete
-export const deleteGist = () => {
-  console.log('删除gist')
+export const ajaxDeleteGist = (gist_id: string) => {
+  return octokit.rest.gists.delete({
+    gist_id,
+  })
 }

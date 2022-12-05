@@ -8,7 +8,7 @@ import {
   window,
   workspace,
 } from 'vscode'
-import { ajaxCreateGist, ajaxForkGist, ajaxStarGist, ajaxUnstarGist } from './ajax'
+import { ajaxCreateGist, ajaxDeleteGist, ajaxForkGist, ajaxStarGist, ajaxUnstarGist } from './ajax'
 import createPicklist from './createPicklist'
 import { back_button_template } from './template'
 import {
@@ -40,7 +40,6 @@ export const showGistsHandler = async (context: ExtensionContext, type: AjaxType
         return
       }
       quickpick.show()
-
       picklist = await createPicklist(page, PER_PAGE, type, username)
     } else {
       picklist = await createPicklist(page, PER_PAGE, type)
@@ -74,6 +73,12 @@ export const showGistsHandler = async (context: ExtensionContext, type: AjaxType
           quickpick.busy = false
           resStatusTip(fork_res.status, 201)
           break
+        case ButtonType.DELETE:
+          quickpick.busy = true
+          const del_res = await ajaxDeleteGist(gist_id)
+          resStatusTip(del_res.status, 204)
+          await showGistsHandler(context, AjaxType.SHOW_AUTH_GISTS)
+          quickpick.busy = false
         default:
           break
       }
@@ -138,7 +143,7 @@ export const showGistsHandler = async (context: ExtensionContext, type: AjaxType
         window.showErrorMessage(err.message)
       }
     })
-
+    quickpick.show()
     quickpick.onDidHide(() => quickpick.dispose())
   } catch (err: any) {
     window.showErrorMessage(err.message)
