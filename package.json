@@ -49,6 +49,11 @@
         "command": "gist-vscode.createGistByFile",
         "title": "Create Gist By File",
         "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.deleteGists",
+        "title": "Delete Gists",
+        "category": "Gist"
       }
     ],
     "menus": {

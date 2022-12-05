@@ -3,6 +3,7 @@ import {
   ExtensionContext,
   InputBox,
   ProgressLocation,
+  QuickPickItem,
   Range,
   Uri,
   window,
@@ -10,147 +11,194 @@ import {
 } from 'vscode'
 import { ajaxCreateGist, ajaxDeleteGist, ajaxForkGist, ajaxStarGist, ajaxUnstarGist } from './ajax'
 import createPicklist from './createPicklist'
-import { back_button_template } from './template'
+import { back_button_template, clear_button_template, more_button_template } from './template'
 import {
   AjaxType,
   ButtonType,
   CreateGistParams,
   CreateGistType,
-  CreateQuickPickType,
   GistQuickPickItem,
+  QuickPickType,
 } from './types'
 import path = require('path')
 import download = require('download')
 
-export const showGistsHandler = async (context: ExtensionContext, type: AjaxType) => {
-  try {
-    let page = 1
-    // per_page default 30
-    let PER_PAGE: number = workspace.getConfiguration('gist-vscode').get('per_page')!
+export const showGistsHandler = async (type: AjaxType) => {
+  let page = 1
+  // per_page default 30
+  let PER_PAGE: number = workspace.getConfiguration('gist-vscode').get('per_page')!
 
-    // 创建 picklist
-    const quickpick = window.createQuickPick()
+  // create input
+  const input = createInputBox(QuickPickType.INPUT, 'List Gists For User')!
 
-    // 获取 picklist
-    let picklist
-    let username: string | undefined
+  // create picklist
+  let quickpick = createQuickPick(QuickPickType.QUICKPICK, 'List Gists For User')!
+
+  // get picklist
+  let picklist: GistQuickPickItem[]
+  let username: string | undefined
+  if (type === AjaxType.SHOW_OTHER_USER_GISTS) {
+    input.onDidAccept(async () => {
+      username = input.value
+
+      if (!username) {
+        input.placeholder = 'Please enter username'
+      } else {
+        quickpick.show()
+        quickpick.busy = true
+        picklist = await createPicklist(page, PER_PAGE, type, username)
+        quickpick.busy = false
+        if (picklist.length === 0) {
+          quickpick.items = [{ label: 'Back' }]
+        } else {
+          quickpick.busy = true
+          quickpick.items = picklist
+          quickpick.busy = false
+        }
+
+        quickpick.onDidChangeActive(e => {
+          const label = e[0].label
+          if (e.length === 1 && label === 'Back') {
+            quickpick.placeholder = 'Not Found'
+          }
+        })
+
+        quickpick.onDidTriggerButton(e => {
+          input.show()
+          quickpick.placeholder = ''
+        })
+
+        quickpick.onDidChangeSelection(e => {
+          if (e[0].label === 'Back') {
+            input.show()
+            quickpick.placeholder = ''
+          }
+        })
+      }
+    })
+    input.show()
+  } else {
+    quickpick = window.createQuickPick()
+    quickpick.show()
+    quickpick.placeholder = 'Search'
+    quickpick.busy = true
+    picklist = await createPicklist(page, PER_PAGE, type)
+    quickpick.items = picklist
+    quickpick.busy = false
+  }
+
+  quickpick.items = picklist!
+
+  // click button
+  quickpick.onDidTriggerItemButton(async (e: any) => {
+    const { user, gist_id } = e.item.owner
+
+    switch (e.button.flag) {
+      case ButtonType.REMOTE:
+        await env.openExternal(Uri.parse(`https://gist.github.com/${user}/${gist_id}`))
+        break
+      case ButtonType.STAR:
+        quickpick.busy = true
+        const star_res = await ajaxStarGist(gist_id)
+        quickpick.busy = false
+        resStatusTip(star_res.status, 204)
+        break
+      case ButtonType.UNSTAR:
+        quickpick.busy = true
+        const unstar_res = await ajaxUnstarGist(gist_id)
+        quickpick.busy = false
+        resStatusTip(unstar_res.status, 204)
+        break
+      case ButtonType.FORK:
+        quickpick.busy = true
+        const fork_res = await ajaxForkGist(gist_id)
+        quickpick.busy = false
+        resStatusTip(fork_res.status, 201)
+        break
+      case ButtonType.DELETE:
+        const label = e.item.label
+        const desc = e.item.description
+        window
+          .showInformationMessage(
+            `Do you want to delete ${label}?`,
+            { modal: true, detail: `Description: ${desc}` },
+            'Delete'
+          )
+          .then(async value => {
+            if (value === 'Delete') {
+              ajaxWithProgress(AjaxType.DELETE_GIST, 'Waiting ...', gist_id)
+            }
+          })
+
+      default:
+        break
+    }
+  })
+
+  // load list
+  let curList: GistQuickPickItem[] = picklist!
+  quickpick.onDidChangeValue(async e => {
+    page++
+    quickpick.busy = true
+    let newPicklist
     if (type === AjaxType.SHOW_OTHER_USER_GISTS) {
-      username = await window.showInputBox({ placeHolder: 'username' })
       if (!username) {
         return
       }
-      quickpick.show()
-      picklist = await createPicklist(page, PER_PAGE, type, username)
+      newPicklist = await createPicklist(page, PER_PAGE, type, username)
     } else {
-      picklist = await createPicklist(page, PER_PAGE, type)
+      newPicklist = await createPicklist(page, PER_PAGE, type)
+    }
+    curList = [...curList, ...newPicklist]
+
+    if (curList.length === quickpick.items.length) {
+      quickpick.busy = false
+      return
     }
 
-    quickpick.items = picklist
+    setTimeout(() => {
+      quickpick.items = curList
+      quickpick.busy = false
+    }, 200)
+  })
 
-    // click button
-    quickpick.onDidTriggerItemButton(async (e: any) => {
-      const { user, gist_id } = e.item.owner
+  // download
+  quickpick.onDidChangeSelection(async e => {
+    try {
+      const { label, description, raw_url, owner, buttons } = e[0] as GistQuickPickItem
 
-      switch (e.button.flag) {
-        case ButtonType.REMOTE:
-          await env.openExternal(Uri.parse(`https://gist.github.com/${user}/${gist_id}`))
-          break
-        case ButtonType.STAR:
-          quickpick.busy = true
-          const star_res = await ajaxStarGist(gist_id)
-          quickpick.busy = false
-          resStatusTip(star_res.status, 204)
-          break
-        case ButtonType.UNSTAR:
-          quickpick.busy = true
-          const unstar_res = await ajaxUnstarGist(gist_id)
-          quickpick.busy = false
-          resStatusTip(unstar_res.status, 204)
-          break
-        case ButtonType.FORK:
-          quickpick.busy = true
-          const fork_res = await ajaxForkGist(gist_id)
-          quickpick.busy = false
-          resStatusTip(fork_res.status, 201)
-          break
-        case ButtonType.DELETE:
-          quickpick.busy = true
-          const del_res = await ajaxDeleteGist(gist_id)
-          resStatusTip(del_res.status, 204)
-          await showGistsHandler(context, AjaxType.SHOW_AUTH_GISTS)
-          quickpick.busy = false
-        default:
-          break
+      // path
+      const root = workspace.workspaceFolders![0]
+      const rootPath = root.uri.fsPath
+
+      // input
+      let input = await window.showInputBox({
+        placeHolder: 'Like src/test',
+        prompt: 'Please use relative path.',
+      })
+
+      if (input && input.match(/\B\/.*/)) {
+        input = input.slice(1)
       }
-    })
 
-    // load list
-    let curList: GistQuickPickItem[] = picklist
-    quickpick.onDidChangeValue(async e => {
-      page++
-      quickpick.busy = true
-      let newPicklist
-      if (type === AjaxType.SHOW_OTHER_USER_GISTS) {
-        if (!username) {
-          return
-        }
-        newPicklist = await createPicklist(page, PER_PAGE, type, username)
+      let dst = ''
+      if (!input) {
+        dst = path.resolve(rootPath)
       } else {
-        newPicklist = await createPicklist(page, PER_PAGE, type)
-      }
-      curList = [...curList, ...newPicklist]
-
-      if (curList.length === quickpick.items.length) {
-        quickpick.busy = false
-        return
+        dst = path.resolve(rootPath, input)
       }
 
-      setTimeout(() => {
-        quickpick.items = curList
-        quickpick.busy = false
-      }, 200)
-    })
-
-    // download
-    quickpick.onDidChangeSelection(async e => {
-      try {
-        const { label, description, raw_url, owner, buttons } = e[0] as GistQuickPickItem
-
-        // path
-        const root = workspace.workspaceFolders![0]
-        const rootPath = root.uri.fsPath
-
-        // input
-        let input = await window.showInputBox({
-          placeHolder: 'Like src/test',
-          prompt: 'Please use relative path.',
-        })
-
-        if (input && input.match(/\B\/.*/)) {
-          input = input.slice(1)
-        }
-
-        let dst = ''
-        if (!input) {
-          dst = path.resolve(rootPath)
-        } else {
-          dst = path.resolve(rootPath, input)
-        }
-
-        // download
-        ajaxWithProgress(AjaxType.GET_GIST, 'Downloading ...', { raw_url, dst, label })
-      } catch (err: any) {
-        window.showErrorMessage(err.message)
-      }
-    })
-    quickpick.show()
-    quickpick.onDidHide(() => quickpick.dispose())
-  } catch (err: any) {
-    window.showErrorMessage(err.message)
-  }
+      // download
+      ajaxWithProgress(AjaxType.GET_GIST, 'Downloading ...', { raw_url, dst, label })
+    } catch (err: any) {
+      window.showErrorMessage('Download Failed. ', err.message)
+    }
+  })
+  quickpick.show()
+  quickpick.onDidHide(() => quickpick.dispose())
 }
 
-export const createGistHandler = async (context: ExtensionContext, type: CreateGistType) => {
+export const createGistHandler = async (type: CreateGistType) => {
   try {
     let filename = ''
     let description = ''
@@ -190,16 +238,16 @@ export const createGistHandler = async (context: ExtensionContext, type: CreateG
     // filename
     let filename_input: InputBox
     if (filename) {
-      filename_input = createInputBox(CreateQuickPickType.FILENAME, title, filename)!
+      filename_input = createInputBox(QuickPickType.FILENAME, title, filename)!
     } else {
-      filename_input = createInputBox(CreateQuickPickType.FILENAME, title)!
+      filename_input = createInputBox(QuickPickType.FILENAME, title)!
     }
 
     // desc
-    const desc_input = createInputBox(CreateQuickPickType.DESCRIPTION, title)
+    const desc_input = createInputBox(QuickPickType.DESCRIPTION, title)
 
     // pick
-    const pick = createQuickPick(CreateQuickPickType.PUBLIC, title)
+    const pick = createQuickPick(QuickPickType.PUBLIC, title)
 
     if (!filename_input || !desc_input || !pick) {
       throw new Error('Sorry, please try again.')
@@ -245,7 +293,7 @@ export const createGistHandler = async (context: ExtensionContext, type: CreateG
       }
 
       // ajax
-      ajaxWithProgress(AjaxType.CREATE_GIST, 'Creating a gist ...', files)
+      ajaxWithProgress(AjaxType.CREATE_GIST, 'Waiting ...', files)
       pick.hide()
     })
 
@@ -257,9 +305,55 @@ export const createGistHandler = async (context: ExtensionContext, type: CreateG
   }
 }
 
-const createInputBox = (type: CreateQuickPickType, title: string, value?: string) => {
+export const deleteGistsHandler = async () => {
+  let page = 1
+  // per_page default 30
+  let PER_PAGE: number = workspace.getConfiguration('gist-vscode').get('per_page')!
+  const picks = window.createQuickPick()
+  picks.show()
+  picks.canSelectMany = true
+  picks.busy = true
+  const picklist = await createPicklist(page, PER_PAGE, AjaxType.SHOW_AUTH_GISTS)
+  picks.items = picklist
+  picks.buttons = [clear_button_template, more_button_template]
+  picks.busy = false
+
+  picks.onDidAccept(() => {
+    console.log('picks.value:', picks.value)
+  })
+
+  picks.onDidTriggerButton(async (e: any) => {
+    console.log('e:', e)
+
+    switch (e.flag) {
+      case ButtonType.MORE:
+        const oldlist = [...picks.items]
+        page++
+        picks.busy = true
+        const newlist = await createPicklist(page, PER_PAGE, AjaxType.SHOW_AUTH_GISTS)
+        picks.items = [...oldlist, ...newlist]
+        picks.busy = false
+        break
+      case ButtonType.CLEAR:
+        picks.selectedItems = []
+        break
+
+      default:
+        break
+    }
+  })
+}
+
+const createInputBox = (type: QuickPickType, title: string, value?: string) => {
   switch (type) {
-    case CreateQuickPickType.FILENAME:
+    case QuickPickType.INPUT:
+      const input = window.createInputBox()
+      input.title = title
+      input.placeholder = 'username'
+      input.step = 1
+      input.totalSteps = 2
+      return input
+    case QuickPickType.FILENAME:
       const filename = window.createInputBox()
       filename.title = title
       filename.placeholder = 'filename'
@@ -267,7 +361,7 @@ const createInputBox = (type: CreateQuickPickType, title: string, value?: string
       filename.step = 1
       filename.totalSteps = 3
       return filename
-    case CreateQuickPickType.DESCRIPTION:
+    case QuickPickType.DESCRIPTION:
       const desc = window.createInputBox()
       desc.title = title
       desc.placeholder = 'description'
@@ -278,15 +372,22 @@ const createInputBox = (type: CreateQuickPickType, title: string, value?: string
   }
 }
 
-const createQuickPick = (type: CreateQuickPickType, title: string) => {
+const createQuickPick = (type: QuickPickType, title: string) => {
   switch (type) {
-    case CreateQuickPickType.PUBLIC:
+    case QuickPickType.QUICKPICK:
       const quickpick = window.createQuickPick()
       quickpick.title = title
-      quickpick.step = 3
-      quickpick.totalSteps = 3
+      quickpick.step = 2
+      quickpick.totalSteps = 2
       quickpick.buttons = [back_button_template]
       return quickpick
+    case QuickPickType.PUBLIC:
+      const pick = window.createQuickPick()
+      pick.title = title
+      pick.step = 3
+      pick.totalSteps = 3
+      pick.buttons = [back_button_template]
+      return pick
   }
 }
 
@@ -325,8 +426,16 @@ const ajaxWithProgress = (type: AjaxType, message: string, params?: any) => {
             await download(raw_url, dst, { filename: label })
             window.showInformationMessage('Success.')
           } catch (err: any) {
-            window.showErrorMessage(err.message)
+            window.showErrorMessage('Failed. ', err.message)
           }
+        case AjaxType.DELETE_GIST:
+          res = await ajaxDeleteGist(params)
+          if (res.status === 204) {
+            window.showInformationMessage('Deleted.')
+          } else {
+            window.showErrorMessage('Failed. ' + res.status)
+          }
+          break
       }
     }
   )

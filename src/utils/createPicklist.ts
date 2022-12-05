@@ -1,6 +1,6 @@
 import { ajaxListAuthGists, ajaxListStarredGists, ajaxListUserGists } from './ajax'
 import { auth_buttons_template, starred_buttons_template, user_buttons_template } from './template'
-import { AjaxType, GistButtons, GistQuickPickItem, ListAuthGistsRes } from './types'
+import { AjaxType, GistButton, GistQuickPickItem, ListAuthGistsRes } from './types'
 
 export default async (
   page: number,
@@ -11,7 +11,7 @@ export default async (
   let res: ListAuthGistsRes | undefined
 
   // buttons
-  let buttons: GistButtons[]
+  let buttons: GistButton[]
 
   // 处理 data
   switch (type) {
