@@ -39,6 +39,16 @@
         "command": "gist-vscode.showUserGists",
         "title": "List Gists For User",
         "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.createGistBySelect",
+        "title": "Create Gist By Select",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.createGistByFile",
+        "title": "Create Gist By File",
+        "category": "Gist"
       }
     ],
     "menus": {

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
-import { showGistsHandler } from './utils/handler'
+import { createGistHandler, showGistsHandler } from './utils/handler'
 import { setTokenHandler } from './utils/pat'
-import { ReqType } from './utils/types'
+import { CreateGistType, ReqType } from './utils/types'
 
 export function activate(context: vscode.ExtensionContext) {
   // set token
@@ -27,7 +27,25 @@ export function activate(context: vscode.ExtensionContext) {
     showGistsHandler(context, ReqType.SHOW_OTHER_USER_GISTS)
   )
 
-  const list = [setToken, showAuthGists, showPublicGists, showStarredGists, showUserGists]
+  // create a gist by selected
+  const createGistBySelect = vscode.commands.registerCommand('gist-vscode.createGistBySelect', () =>
+    createGistHandler(context, CreateGistType.SELECTED)
+  )
+
+  // create a gist by file
+  const createGistByFile = vscode.commands.registerCommand('gist-vscode.createGistByFile', () =>
+    createGistHandler(context, CreateGistType.FILE)
+  )
+
+  const list = [
+    setToken,
+    showAuthGists,
+    showPublicGists,
+    showStarredGists,
+    showUserGists,
+    createGistBySelect,
+    createGistByFile,
+  ]
 
   context.subscriptions.push(...list)
 }

@@ -1,7 +1,25 @@
-import { env, ExtensionContext, Uri, window, workspace } from 'vscode'
-import { ajaxForkGist, ajaxStarGist, ajaxUnstarGist } from './ajax'
+import {
+  env,
+  ExtensionContext,
+  InputBox,
+  ProgressLocation,
+  Range,
+  Uri,
+  window,
+  workspace,
+} from 'vscode'
+import { ajaxCreateGist, ajaxForkGist, ajaxStarGist, ajaxUnstarGist } from './ajax'
 import createPicklist from './createPicklist'
-import { ButtonTip, GistQuickPickItem, ReqType } from './types'
+import { back_button } from './template'
+import {
+  AjaxType,
+  ButtonType,
+  CreateGistParams,
+  CreateGistType,
+  CreateQuickPickType,
+  GistQuickPickItem,
+  ReqType,
+} from './types'
 import path = require('path')
 import download = require('download')
 
@@ -14,7 +32,7 @@ export const showGistsHandler = async (context: ExtensionContext, type: ReqType)
   let picklist
   let username: string | undefined
   if (type === ReqType.SHOW_OTHER_USER_GISTS) {
-    username = await window.showInputBox({ value: 'username' })
+    username = await window.showInputBox({ placeHolder: 'username' })
     if (!username) {
       return
     }
@@ -33,38 +51,26 @@ export const showGistsHandler = async (context: ExtensionContext, type: ReqType)
       const { user, gist_id } = e.item.owner
 
       switch (e.button.flag) {
-        case ButtonTip.REMOTE:
+        case ButtonType.REMOTE:
           await env.openExternal(Uri.parse(`https://gist.github.com/${user}/${gist_id}`))
           break
-        case ButtonTip.STAR:
+        case ButtonType.STAR:
           quickpick.busy = true
           const star_res = await ajaxStarGist(gist_id)
           quickpick.busy = false
-          if (star_res.status === 204) {
-            window.showInformationMessage('Success.')
-          } else {
-            window.showWarningMessage('Failed.' + star_res.status)
-          }
+          resStatusTip(star_res.status, 204)
           break
-        case ButtonTip.UNSTAR:
+        case ButtonType.UNSTAR:
           quickpick.busy = true
           const unstar_res = await ajaxUnstarGist(gist_id)
           quickpick.busy = false
-          if (unstar_res.status === 204) {
-            window.showInformationMessage('Success.')
-          } else {
-            window.showWarningMessage('Failed.' + unstar_res.status)
-          }
+          resStatusTip(unstar_res.status, 204)
           break
-        case ButtonTip.FORK:
+        case ButtonType.FORK:
           quickpick.busy = true
           const fork_res = await ajaxForkGist(gist_id)
           quickpick.busy = false
-          if (fork_res.status === 201) {
-            window.showInformationMessage('Success.')
-          } else {
-            window.showWarningMessage('Failed.' + fork_res.status)
-          }
+          resStatusTip(fork_res.status, 201)
           break
         default:
           break
@@ -108,36 +114,24 @@ export const showGistsHandler = async (context: ExtensionContext, type: ReqType)
         const rootPath = root.uri.fsPath
 
         // input
-        const INPUT_DEFAULT_VALUE = 'Like src/test'
         let input = await window.showInputBox({
-          value: INPUT_DEFAULT_VALUE,
+          placeHolder: 'Like src/test',
           prompt: 'Please use relative path.',
         })
 
-        if (input === undefined) {
-          return
-        }
-
-        if (input.match(/\B\/.*/)) {
+        if (input && input.match(/\B\/.*/)) {
           input = input.slice(1)
         }
 
         let dst = ''
-        if (input === INPUT_DEFAULT_VALUE || input === '') {
+        if (!input) {
           dst = path.resolve(rootPath)
         } else {
           dst = path.resolve(rootPath, input)
         }
 
         // download
-        await download(raw_url, dst, { filename: label })
-
-        // tip
-        window.showInformationMessage(
-          `Success. You can find ${label} in ${
-            input === INPUT_DEFAULT_VALUE || input === '' ? 'workspace root path' : input
-          }.`
-        )
+        ajaxWithProgress(AjaxType.GET_GIST, 'Downloading ...', { raw_url, dst, label })
       } catch (err: any) {
         window.showErrorMessage(err.message)
       }
@@ -148,4 +142,186 @@ export const showGistsHandler = async (context: ExtensionContext, type: ReqType)
   } catch (err: any) {
     window.showErrorMessage(err.message)
   }
+}
+
+export const createGistHandler = async (context: ExtensionContext, type: CreateGistType) => {
+  try {
+    let filename = ''
+    let description = ''
+    let content = ''
+
+    if (type === CreateGistType.SELECTED) {
+      // 获取选中代码块
+      const editor = window.activeTextEditor
+      if (!editor) {
+        throw new Error('Got a bug!')
+      }
+      const {
+        document: { lineAt, getText },
+        selection: { start, end, active },
+      } = editor
+      content = (
+        start.isEqual(end) ? lineAt(active.line).text : getText(new Range(start, end))
+      ).trim()
+
+      // 判断选中区域中有没有代码
+      if (!content.match(/\w+/)) {
+        throw new Error(`Selected code is empty.`)
+      }
+    }
+
+    if (type === CreateGistType.FILE) {
+      const editor = window.activeTextEditor
+
+      filename = editor?.document.fileName.split(path.sep).pop()!
+
+      content = editor?.document.getText()!
+    }
+
+    // title
+    const title = 'Create Gist'
+
+    // filename
+    let filename_input: InputBox
+    if (filename) {
+      filename_input = createInputBox(CreateQuickPickType.FILENAME, title, filename)!
+    } else {
+      filename_input = createInputBox(CreateQuickPickType.FILENAME, title)!
+    }
+
+    // desc
+    const desc_input = createInputBox(CreateQuickPickType.DESCRIPTION, title)
+
+    // pick
+    const pick = createQuickPick(CreateQuickPickType.PUBLIC, title)
+
+    if (!filename_input || !desc_input || !pick) {
+      throw new Error('Sorry, please try again.')
+    }
+
+    filename_input.show()
+
+    filename_input.onDidAccept(() => {
+      filename = filename_input.value
+      if (!filename) {
+        filename_input.placeholder = 'Please enter a filename'
+      } else {
+        desc_input.show()
+      }
+    })
+
+    desc_input.onDidAccept(() => {
+      description = desc_input.value
+      pick.items = [
+        {
+          label: 'Public',
+        },
+        {
+          label: 'Private',
+        },
+      ]
+      pick.show()
+    })
+    desc_input.onDidTriggerButton(e => {
+      filename_input.show()
+    })
+
+    pick.onDidChangeSelection(async e => {
+      // files
+      const files: CreateGistParams = {
+        description,
+        public: e[0].label === 'Public' ? true : false,
+        files: {
+          [filename]: {
+            content,
+          },
+        },
+      }
+
+      // ajax
+      ajaxWithProgress(AjaxType.CREATE_GIST, 'Creating a gist ...', files)
+      pick.hide()
+    })
+
+    pick.onDidTriggerButton(e => {
+      desc_input.show()
+    })
+  } catch (err: any) {
+    window.showErrorMessage(err.message)
+  }
+}
+
+const createInputBox = (type: CreateQuickPickType, title: string, value?: string) => {
+  switch (type) {
+    case CreateQuickPickType.FILENAME:
+      const filename = window.createInputBox()
+      filename.title = title
+      filename.placeholder = 'filename'
+      value ? (filename.value = value) : ''
+      filename.step = 1
+      filename.totalSteps = 3
+      return filename
+    case CreateQuickPickType.DESCRIPTION:
+      const desc = window.createInputBox()
+      desc.title = title
+      desc.placeholder = 'description'
+      desc.step = 2
+      desc.totalSteps = 3
+      desc.buttons = [back_button]
+      return desc
+  }
+}
+
+const createQuickPick = (type: CreateQuickPickType, title: string) => {
+  switch (type) {
+    case CreateQuickPickType.PUBLIC:
+      const quickpick = window.createQuickPick()
+      quickpick.title = title
+      quickpick.step = 3
+      quickpick.totalSteps = 3
+      quickpick.buttons = [back_button]
+      return quickpick
+  }
+}
+
+// tip
+const resStatusTip = (status: number, compare: number) => {
+  if (status === compare) {
+    window.showInformationMessage('Success.')
+  } else {
+    window.showWarningMessage('Failed.' + status)
+  }
+}
+
+const ajaxWithProgress = (type: AjaxType, message: string, params?: any) => {
+  window.withProgress(
+    {
+      location: ProgressLocation.Notification,
+    },
+    async progress => {
+      progress.report({
+        message,
+      })
+
+      let res
+      switch (type) {
+        case AjaxType.CREATE_GIST:
+          res = await ajaxCreateGist(params)
+          if (res.status === 201) {
+            window.showInformationMessage('Success.')
+          } else {
+            window.showErrorMessage('Failed. ' + res.status)
+          }
+          break
+        case AjaxType.GET_GIST:
+          try {
+            const { raw_url, dst, label } = params
+            await download(raw_url, dst, { filename: label })
+            window.showInformationMessage('Success.')
+          } catch (err: any) {
+            window.showErrorMessage(err.message)
+          }
+      }
+    }
+  )
 }

@@ -1,5 +1,6 @@
 import { Octokit } from '@Octokit/rest'
 import { commands, workspace } from 'vscode'
+import { CreateGistParams } from './types'
 
 //  confirm token
 const token: string | undefined = workspace.getConfiguration('gist-vscode').get('token')
@@ -58,8 +59,8 @@ export const ajaxForkGist = (gist_id: string) => {
 }
 
 // create
-export const createGist = () => {
-  console.log('创建gist')
+export const ajaxCreateGist = (files: CreateGistParams) => {
+  return octokit.rest.gists.create(files)
 }
 
 // update

@@ -1,7 +1,7 @@
 import { ThemeIcon } from 'vscode'
 import { ajaxListAuthGists, ajaxListStarredGists, ajaxListUserGists } from './ajax'
 import { auth_buttons_template, starred_buttons_template, user_buttons_template } from './template'
-import { ButtonTip, GistButtons, GistQuickPickItem, ListAuthGistsRes, ReqType } from './types'
+import { GistButtons, GistQuickPickItem, ListAuthGistsRes, ReqType } from './types'
 
 export default async (
   page: number,
