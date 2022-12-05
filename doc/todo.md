@@ -13,9 +13,10 @@
   - unstar
   - gist
 - 显示其他用户的 gist
+
   - star
   - fork
   - gist
 
-- download a gist
-
+- download a gist by select
+- download a gist by file
