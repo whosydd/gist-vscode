@@ -1,10 +1,5 @@
 import { Endpoints } from '@octokit/types'
-import {
-  QuickInputButton,
-  QuickInputButtons,
-  QuickPickItem,
-  QuickPickItemButtonEvent,
-} from 'vscode'
+import { QuickInputButton, QuickPickItem } from 'vscode'
 
 export interface GistQuickPickItem extends QuickPickItem {
   raw_url: string
@@ -28,6 +23,9 @@ export enum ReqType {
 
 export enum ButtonTip {
   REMOTE,
+  STAR,
+  UNSTAR,
+  FORK,
 }
 
 export type ListAuthGistsRes = Endpoints['GET /gists']['response']

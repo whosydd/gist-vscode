@@ -40,6 +40,7 @@ export const setTokenHandler = async () => {
     vscode.window.showInformationMessage('Already done.', 'Open User Settings').then(value => {
       if (value === 'Open User Settings') {
         vscode.commands.executeCommand('workbench.action.openApplicationSettingsJson')
+        vscode.workspace.getConfiguration('gist-vscode').update('token', token, true)
       }
     })
   }

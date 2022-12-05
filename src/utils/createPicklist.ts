@@ -1,30 +1,36 @@
-import { Octokit } from '@octokit/rest'
-import { commands, ThemeIcon, workspace } from 'vscode'
-import { showAuthGists, showPublicGists } from './ajax'
+import { ThemeIcon } from 'vscode'
+import { ajaxListAuthGists, ajaxListStarredGists, ajaxListUserGists } from './ajax'
+import { auth_buttons_template, starred_buttons_template, user_buttons_template } from './template'
 import { ButtonTip, GistButtons, GistQuickPickItem, ListAuthGistsRes, ReqType } from './types'
 
-const token: string | undefined = workspace.getConfiguration('gist-vscode').get('token')
-
-if (!token) {
-  commands.executeCommand('gist-vscode.setToken')
-}
 export default async (
   page: number,
   per_page: number,
-  type: ReqType
+  type: ReqType,
+  username?: string
 ): Promise<GistQuickPickItem[]> => {
-  const octokit = new Octokit({
-    auth: token,
-  })
   let res: ListAuthGistsRes | undefined
 
-  // 处理 ajax
+  // buttons
+  let buttons: GistButtons[]
+
+  // 处理 data
   switch (type) {
     case ReqType.SHOW_AUTH_GISTS:
-      res = await showAuthGists(octokit, page, per_page)
+      res = await ajaxListAuthGists(page, per_page)
+      buttons = auth_buttons_template
       break
-    case ReqType.SHOW_PUBLIC_GISTS:
-      res = await showPublicGists(octokit, page, per_page)
+    // case ReqType.SHOW_PUBLIC_GISTS:
+    //   res = await ajaxListPublicGists(octokit, page, per_page)
+    //   break
+    case ReqType.SHOW_STARRED_GISTS:
+      res = await ajaxListStarredGists(page, per_page)
+      buttons = starred_buttons_template
+      break
+    case ReqType.SHOW_OTHER_USER_GISTS:
+      res = await ajaxListUserGists(page, per_page, username!)
+      buttons = user_buttons_template
+      break
     default:
       break
   }
@@ -33,15 +39,6 @@ export default async (
   if (res && res.status !== 200) {
     throw new Error('request failed.')
   }
-
-  // buttons
-  const buttons: GistButtons[] = [
-    {
-      iconPath: new ThemeIcon('github'),
-      tooltip: 'Open gist in browser',
-      flag: ButtonTip.REMOTE,
-    },
-  ]
 
   return new Promise((resolve, reject) => {
     // 处理响应数据格式
@@ -60,7 +57,7 @@ export default async (
         },
         buttons,
       }
-      return [pick, ...pre]
+      return [...pre, pick]
     }, [])
 
     resolve(pickList)

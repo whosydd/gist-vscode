@@ -17,20 +17,35 @@
     "commands": [
       {
         "command": "gist-vscode.setToken",
-        "title": "set token",
+        "title": "Set Token",
         "category": "Gist"
       },
       {
         "command": "gist-vscode.showAuthGists",
-        "title": "list gists for authenticated user",
+        "title": "List Gists For Authenticated User",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.showPublicGists",
+        "title": "List Public Gists",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.showStarredGists",
+        "title": "List Starred Gists",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.showUserGists",
+        "title": "List Gists For User",
         "category": "Gist"
       }
     ],
     "menus": {
-      "editor/title": [],
-      "explorer/context": [
+      "commandPalette": [
         {
-          "command": "gist-vscode.showAuthGists"
+          "command": "gist-vscode.showPublicGists",
+          "when": "null"
         }
       ]
     },
