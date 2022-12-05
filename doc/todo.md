@@ -8,5 +8,14 @@
 
 - PAT 相关
 - 显示已验证用户的 gists
-  - 点击 `github` 图标跳转到 gist.github.com
+  - gist
+- 显示已经 star 的 gists
+  - unstar
+  - gist
+- 显示其他用户的 gist
+  - star
+  - fork
+  - gist
+
 - download a gist
+
