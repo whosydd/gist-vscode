@@ -10,7 +10,7 @@ import {
 } from 'vscode'
 import { ajaxCreateGist, ajaxForkGist, ajaxStarGist, ajaxUnstarGist } from './ajax'
 import createPicklist from './createPicklist'
-import { back_button } from './template'
+import { back_button_template } from './template'
 import {
   AjaxType,
   ButtonType,
@@ -18,32 +18,34 @@ import {
   CreateGistType,
   CreateQuickPickType,
   GistQuickPickItem,
-  ReqType,
 } from './types'
 import path = require('path')
 import download = require('download')
 
-export const showGistsHandler = async (context: ExtensionContext, type: ReqType) => {
-  let page = 1
-  // per_page default 30
-  let PER_PAGE: number = workspace.getConfiguration('gist-vscode').get('per_page')!
-
-  // 获取 picklist
-  let picklist
-  let username: string | undefined
-  if (type === ReqType.SHOW_OTHER_USER_GISTS) {
-    username = await window.showInputBox({ placeHolder: 'username' })
-    if (!username) {
-      return
-    }
-    picklist = await createPicklist(page, PER_PAGE, type, username)
-  } else {
-    picklist = await createPicklist(page, PER_PAGE, type)
-  }
-
+export const showGistsHandler = async (context: ExtensionContext, type: AjaxType) => {
   try {
+    let page = 1
+    // per_page default 30
+    let PER_PAGE: number = workspace.getConfiguration('gist-vscode').get('per_page')!
+
     // 创建 picklist
     const quickpick = window.createQuickPick()
+
+    // 获取 picklist
+    let picklist
+    let username: string | undefined
+    if (type === AjaxType.SHOW_OTHER_USER_GISTS) {
+      username = await window.showInputBox({ placeHolder: 'username' })
+      if (!username) {
+        return
+      }
+      quickpick.show()
+
+      picklist = await createPicklist(page, PER_PAGE, type, username)
+    } else {
+      picklist = await createPicklist(page, PER_PAGE, type)
+    }
+
     quickpick.items = picklist
 
     // click button
@@ -83,7 +85,7 @@ export const showGistsHandler = async (context: ExtensionContext, type: ReqType)
       page++
       quickpick.busy = true
       let newPicklist
-      if (type === ReqType.SHOW_OTHER_USER_GISTS) {
+      if (type === AjaxType.SHOW_OTHER_USER_GISTS) {
         if (!username) {
           return
         }
@@ -138,7 +140,6 @@ export const showGistsHandler = async (context: ExtensionContext, type: ReqType)
     })
 
     quickpick.onDidHide(() => quickpick.dispose())
-    quickpick.show()
   } catch (err: any) {
     window.showErrorMessage(err.message)
   }
@@ -267,7 +268,7 @@ const createInputBox = (type: CreateQuickPickType, title: string, value?: string
       desc.placeholder = 'description'
       desc.step = 2
       desc.totalSteps = 3
-      desc.buttons = [back_button]
+      desc.buttons = [back_button_template]
       return desc
   }
 }
@@ -279,7 +280,7 @@ const createQuickPick = (type: CreateQuickPickType, title: string) => {
       quickpick.title = title
       quickpick.step = 3
       quickpick.totalSteps = 3
-      quickpick.buttons = [back_button]
+      quickpick.buttons = [back_button_template]
       return quickpick
   }
 }

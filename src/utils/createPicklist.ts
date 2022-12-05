@@ -1,12 +1,11 @@
-import { ThemeIcon } from 'vscode'
 import { ajaxListAuthGists, ajaxListStarredGists, ajaxListUserGists } from './ajax'
 import { auth_buttons_template, starred_buttons_template, user_buttons_template } from './template'
-import { GistButtons, GistQuickPickItem, ListAuthGistsRes, ReqType } from './types'
+import { AjaxType, GistButtons, GistQuickPickItem, ListAuthGistsRes } from './types'
 
 export default async (
   page: number,
   per_page: number,
-  type: ReqType,
+  type: AjaxType,
   username?: string
 ): Promise<GistQuickPickItem[]> => {
   let res: ListAuthGistsRes | undefined
@@ -16,18 +15,18 @@ export default async (
 
   // 处理 data
   switch (type) {
-    case ReqType.SHOW_AUTH_GISTS:
+    case AjaxType.SHOW_AUTH_GISTS:
       res = await ajaxListAuthGists(page, per_page)
       buttons = auth_buttons_template
       break
-    // case ReqType.SHOW_PUBLIC_GISTS:
+    // case AjaxType.SHOW_PUBLIC_GISTS:
     //   res = await ajaxListPublicGists(octokit, page, per_page)
     //   break
-    case ReqType.SHOW_STARRED_GISTS:
+    case AjaxType.SHOW_STARRED_GISTS:
       res = await ajaxListStarredGists(page, per_page)
       buttons = starred_buttons_template
       break
-    case ReqType.SHOW_OTHER_USER_GISTS:
+    case AjaxType.SHOW_OTHER_USER_GISTS:
       res = await ajaxListUserGists(page, per_page, username!)
       buttons = user_buttons_template
       break

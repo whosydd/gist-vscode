@@ -3,6 +3,11 @@ import { ButtonType, GistButtons } from './types'
 
 export const auth_buttons_template: GistButtons[] = [
   {
+    iconPath: new ThemeIcon('trash'),
+    tooltip: 'Delete',
+    flag: ButtonType.DELETE,
+  },
+  {
     iconPath: new ThemeIcon('github'),
     tooltip: 'Open gist in browser',
     flag: ButtonType.REMOTE,
@@ -15,6 +20,7 @@ export const starred_buttons_template: GistButtons[] = [
     tooltip: 'Unstar',
     flag: ButtonType.UNSTAR,
   },
+
   {
     iconPath: new ThemeIcon('github'),
     tooltip: 'Open gist in the browser',
@@ -40,7 +46,7 @@ export const user_buttons_template: GistButtons[] = [
   },
 ]
 
-export const back_button: GistButtons = {
+export const back_button_template: GistButtons = {
   iconPath: new ThemeIcon('arrow-left'),
   tooltip: 'Back',
   flag: ButtonType.BACK,

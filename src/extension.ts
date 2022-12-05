@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
 import { createGistHandler, showGistsHandler } from './utils/handler'
 import { setTokenHandler } from './utils/pat'
-import { CreateGistType, ReqType } from './utils/types'
+import { AjaxType, CreateGistType } from './utils/types'
 
 export function activate(context: vscode.ExtensionContext) {
   // set token
@@ -9,22 +9,22 @@ export function activate(context: vscode.ExtensionContext) {
 
   // list auth user gists
   const showAuthGists = vscode.commands.registerCommand('gist-vscode.showAuthGists', () =>
-    showGistsHandler(context, ReqType.SHOW_AUTH_GISTS)
+    showGistsHandler(context, AjaxType.SHOW_AUTH_GISTS)
   )
 
   // list public gists
   const showPublicGists = vscode.commands.registerCommand('gist-vscode.showPublicGists', () =>
-    showGistsHandler(context, ReqType.SHOW_PUBLIC_GISTS)
+    showGistsHandler(context, AjaxType.SHOW_PUBLIC_GISTS)
   )
 
   // list starred gists
   const showStarredGists = vscode.commands.registerCommand('gist-vscode.showStarredGists', () =>
-    showGistsHandler(context, ReqType.SHOW_STARRED_GISTS)
+    showGistsHandler(context, AjaxType.SHOW_STARRED_GISTS)
   )
 
   // list other user gists
   const showUserGists = vscode.commands.registerCommand('gist-vscode.showUserGists', () =>
-    showGistsHandler(context, ReqType.SHOW_OTHER_USER_GISTS)
+    showGistsHandler(context, AjaxType.SHOW_OTHER_USER_GISTS)
   )
 
   // create a gist by selected

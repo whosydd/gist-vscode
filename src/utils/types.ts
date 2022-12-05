@@ -13,20 +13,13 @@ export interface GistButtons extends QuickInputButton {
   flag: ButtonType
 }
 
-export enum ReqType {
-  SHOW_AUTH_GISTS,
-  SHOW_STARRED_GISTS,
-  SHOW_FORKED_GISTS,
-  SHOW_PUBLIC_GISTS,
-  SHOW_OTHER_USER_GISTS,
-}
-
 export enum ButtonType {
   REMOTE,
   STAR,
   UNSTAR,
   FORK,
   BACK,
+  DELETE,
 }
 
 export enum CreateQuickPickType {
@@ -43,6 +36,11 @@ export enum CreateGistType {
 export enum AjaxType {
   CREATE_GIST,
   GET_GIST,
+  SHOW_AUTH_GISTS,
+  SHOW_STARRED_GISTS,
+  SHOW_FORKED_GISTS,
+  SHOW_PUBLIC_GISTS,
+  SHOW_OTHER_USER_GISTS,
 }
 
 export type ListAuthGistsRes = Endpoints['GET /gists']['response']
