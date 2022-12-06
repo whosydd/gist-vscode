@@ -1,6 +1,15 @@
 import { ajaxListAuthGists, ajaxListStarredGists, ajaxListUserGists } from './ajax'
-import { auth_buttons_template, starred_buttons_template, user_buttons_template } from './template'
-import { AjaxType, GistButton, GistQuickPickItem, ListAuthGistsRes } from './types'
+import {
+  AjaxType,
+  DELETE,
+  FORK,
+  GistButton,
+  GistQuickPickItem,
+  GITHUB,
+  ListAuthGistsRes,
+  STAR,
+  UNSTAR,
+} from './types'
 
 export default async (
   page: number,
@@ -17,18 +26,18 @@ export default async (
   switch (type) {
     case AjaxType.SHOW_AUTH_GISTS:
       res = await ajaxListAuthGists(page, per_page)
-      buttons = auth_buttons_template
+      buttons = [DELETE, GITHUB]
       break
     // case AjaxType.SHOW_PUBLIC_GISTS:
     //   res = await ajaxListPublicGists(octokit, page, per_page)
     //   break
     case AjaxType.SHOW_STARRED_GISTS:
       res = await ajaxListStarredGists(page, per_page)
-      buttons = starred_buttons_template
+      buttons = [UNSTAR, GITHUB]
       break
-    case AjaxType.SHOW_OTHER_USER_GISTS:
+    case AjaxType.SHOW_USER_GISTS:
       res = await ajaxListUserGists(page, per_page, username!)
-      buttons = user_buttons_template
+      buttons = [STAR, FORK, GITHUB]
       break
     default:
       break

@@ -10,7 +10,15 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:gist-vscode.helloWorld"
+    "onCommand:gist-vscode.setToken",
+    "onCommand:gist-vscode.showAuthGists",
+    "onCommand:gist-vscode.showStarredGists",
+    "onCommand:gist-vscode.showUserGists",
+    "onCommand:gist-vscode.createGistBySelect",
+    "onCommand:gist-vscode.createGistByFile",
+    "onCommand:gist-vscode.deleteGists",
+    "onCommand:gist-vscode.generate",
+    "onCommand:gist-vscode.dev"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -23,11 +31,6 @@
       {
         "command": "gist-vscode.showAuthGists",
         "title": "List Gists For Authenticated User",
-        "category": "Gist"
-      },
-      {
-        "command": "gist-vscode.showPublicGists",
-        "title": "List Public Gists",
         "category": "Gist"
       },
       {
@@ -48,25 +51,86 @@
       {
         "command": "gist-vscode.createGistByFile",
         "title": "Create Gist By File",
-        "category": "Gist"
+        "category": "Gist",
+        "icon": "$(github)"
       },
       {
         "command": "gist-vscode.deleteGists",
         "title": "Delete Gists",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.generate",
+        "title": "Generate Files",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.dev",
+        "title": "DEV",
         "category": "Gist"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "gist-vscode.showPublicGists",
+          "command": "gist-vscode.createGistByFile",
           "when": "null"
+        },
+        {
+          "command": "gist-vscode.createGistBySelect",
+          "when": "null"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "group": "navigation",
+          "when": "config.gist-vscode.showTitleIcon"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "group": "0_modification",
+          "when": "editorFocus && !editorHasSelection"
+        },
+        {
+          "command": "gist-vscode.createGistBySelect",
+          "group": "0_modification",
+          "when": "editorHasSelection"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "group": "0_modification",
+          "when": "filesExplorerFocus && !explorerResourceIsFolder && !inputFocus"
+        },
+        {
+          "command": "gist-vscode.showAuthGists",
+          "group": "0_modification",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "gist-vscode.showStarredGists",
+          "group": "0_modification",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "gist-vscode.showUserGists",
+          "group": "0_modification",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "gist-vscode.generate",
+          "group": "1_modification",
+          "when": "explorerResourceIsFolder"
         }
       ]
     },
     "configuration": [
       {
-        "title": "Gist for VSCode: configuration",
+        "title": "Gist for VSCode: Configuration",
         "properties": {
           "gist-vscode.token": {
             "type": "string",
@@ -79,8 +143,34 @@
           },
           "gist-vscode.per_page": {
             "type": "number",
+            "maximum": 100,
             "default": 30,
-            "description": "Data per request."
+            "description": "Data per request"
+          },
+          "gist-vscode.showTitleIcon": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show icon on the editor title"
+          },
+          "gist-vscode.generate": {
+            "type": "object",
+            "properties": {
+              "username": {
+                "type": "string",
+                "default": "",
+                "description": "Github account"
+              },
+              "files": {
+                "type": "array",
+                "default": [],
+                "description": "Need gist_id"
+              }
+            },
+            "default": {
+              "username": "",
+              "files": []
+            },
+            "description": "Generate from gist"
           }
         }
       }
