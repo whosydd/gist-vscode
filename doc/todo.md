@@ -2,21 +2,11 @@
 
 ## TODO
 
-## DONE
+- 多用户配置
 
-### 命令行
+  - 默认账户
+  - 账户选择菜单
 
-- PAT 相关
-- 显示已验证用户的 gists
-  - gist
-- 显示已经 star 的 gists
-  - unstar
-  - gist
-- 显示其他用户的 gist
-
-  - star
-  - fork
-  - gist
-
-- download a gist by select
-- download a gist by file
+- 修改 gist
+  - 将 gist 文件下载到项目根目录中的 `.gist` 文件夹
+  - 点击 `.gist` 文件夹上传文件夹内所有文件，如果不存在就创建
