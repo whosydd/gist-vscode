@@ -9,9 +9,19 @@
   "categories": [
     "Other"
   ],
+  "author": {
+    "name": "GY",
+    "email": "dev.youngkwok718@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whosydd/gist-vscode.git"
+  },
+  "icon": "./icon.png",
   "activationEvents": [
     "onCommand:gist-vscode.setToken",
     "onCommand:gist-vscode.showAuthGists",
+    "onCommand:gist-vscode.showPublicGists",
     "onCommand:gist-vscode.showStarredGists",
     "onCommand:gist-vscode.showUserGists",
     "onCommand:gist-vscode.createGistBySelect",
@@ -31,6 +41,11 @@
       {
         "command": "gist-vscode.showAuthGists",
         "title": "List Gists For Authenticated User",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.showPublicGists",
+        "title": "List Public Gists",
         "category": "Gist"
       },
       {
@@ -61,7 +76,7 @@
       },
       {
         "command": "gist-vscode.generate",
-        "title": "Generate Files",
+        "title": "Generate Files By Gist",
         "category": "Gist"
       },
       {
@@ -78,6 +93,10 @@
         },
         {
           "command": "gist-vscode.createGistBySelect",
+          "when": "null"
+        },
+        {
+          "command": "gist-vscode.generate",
           "when": "null"
         }
       ],
@@ -108,6 +127,11 @@
         },
         {
           "command": "gist-vscode.showAuthGists",
+          "group": "0_modification",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "gist-vscode.showPublicGists",
           "group": "0_modification",
           "when": "explorerResourceIsFolder"
         },
@@ -153,24 +177,22 @@
             "description": "Show icon on the editor title"
           },
           "gist-vscode.generate": {
-            "type": "object",
-            "properties": {
-              "username": {
-                "type": "string",
-                "default": "",
-                "description": "Github account"
-              },
-              "files": {
-                "type": "array",
-                "default": [],
-                "description": "Need gist_id"
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "label",
+                "url"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
               }
-            },
-            "default": {
-              "username": "",
-              "files": []
-            },
-            "description": "Generate from gist"
+            }
           }
         }
       }
