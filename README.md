@@ -12,17 +12,14 @@ PAT
 
 ## Getting Started
 
-
-
 ## Settings
 
-* `gist-vscode.token`: PAT from https://github.com/settings/tokens
+- `gist-vscode.token`: PAT from https://github.com/settings/tokens
 
-* `gist-vscode.per_page`: Data per request.
-
-  
+- `gist-vscode.per_page`: Data per request.
 
 ## Known Issues
 
+## Thanks
 
-
+<a href="https://www.flaticon.com/free-icons/github" title="github icons">Github icons created by Roundicons - Flaticon</a>
