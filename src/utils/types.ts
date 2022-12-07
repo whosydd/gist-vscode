@@ -13,6 +13,11 @@ export interface GistButton extends QuickInputButton {
   flag: ButtonType
 }
 
+export type GenerateItem = {
+  label: string
+  url: string
+}
+
 export enum ButtonType {
   REMOTE,
   STAR,
@@ -22,14 +27,7 @@ export enum ButtonType {
   DELETE,
   MORE,
   CLEAR,
-}
-
-export enum QuickPickType {
-  INPUT,
-  QUICKPICK,
-  FILENAME,
-  DESCRIPTION,
-  PUBLIC,
+  GENERATE,
 }
 
 export enum CreateGistType {
@@ -49,6 +47,9 @@ export enum AjaxType {
 }
 
 export type ListAuthGistsRes = Endpoints['GET /gists']['response']
+export type ListStarredGistsRes = Endpoints['GET /gists/starred']['response']
+export type ListUserGistsRes = Endpoints['GET /users/{username}/gists']['response']
+export type ListPublicGistRes = Endpoints['GET /gists/public']['response']
 
 export type CreateGistParams = Endpoints['POST /gists']['parameters']
 
@@ -96,4 +97,10 @@ export const CLEAR: GistButton = {
   iconPath: new ThemeIcon('clear-all'),
   tooltip: 'Clear',
   flag: ButtonType.CLEAR,
+}
+
+export const GENERATE: GistButton = {
+  iconPath: new ThemeIcon('repo-create'),
+  tooltip: 'Add To Generate List',
+  flag: ButtonType.GENERATE,
 }

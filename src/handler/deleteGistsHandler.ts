@@ -1,42 +1,59 @@
-import { window, workspace } from 'vscode'
-import { AjaxType, ButtonType, CLEAR, MORE } from '../utils/types'
+import { ProgressLocation, window, workspace } from 'vscode'
+import { ajaxDeleteGist } from '../utils/ajax'
+import { itemButtonTrigger } from '../utils/buttonTrigger'
+import { AjaxType, ButtonType, CLEAR, GistButton, GistQuickPickItem, MORE } from '../utils/types'
 import createPicklist from '../utils/updatePicklist'
 
 export default async () => {
   let page = 1
   // per_page default 30
-  let PER_PAGE: number = workspace.getConfiguration('gist-vscode').get('per_page')!
-  const picks = window.createQuickPick()
-  picks.show()
-  picks.canSelectMany = true
-  picks.busy = true
-  const picklist = await createPicklist(page, PER_PAGE, AjaxType.SHOW_AUTH_GISTS)
-  picks.items = picklist
-  picks.buttons = [CLEAR, MORE]
-  picks.busy = false
+  let per_page: number = workspace.getConfiguration('gist-vscode').get('per_page')!
+  const quickpick = window.createQuickPick()
+  quickpick.show()
+  quickpick.canSelectMany = true
+  quickpick.busy = true
+  const picklist = await createPicklist(page, per_page, AjaxType.SHOW_AUTH_GISTS)
+  quickpick.items = picklist
+  quickpick.buttons = [CLEAR, MORE]
+  quickpick.busy = false
 
-  picks.onDidAccept(() => {
-    console.log('picks.value:', picks.value)
+  quickpick.onDidAccept(() => {
+    const delList = quickpick.selectedItems
+
+    if (delList.length === 0) {
+      return
+    }
+
+    window.withProgress({ location: ProgressLocation.Notification }, async progress => {
+      progress.report({ message: 'Deleting ...' })
+      delList.forEach(async e => {
+        const gist_id = (e as GistQuickPickItem).owner.gist_id
+        const res = await ajaxDeleteGist(gist_id)
+        if (res.status !== 204) {
+          window.showWarningMessage(`${e.label} delete failed!`)
+        }
+      })
+      quickpick.dispose()
+    })
   })
 
-  picks.onDidTriggerButton(async (e: any) => {
-    console.log('e:', e)
-
-    switch (e.flag) {
+  quickpick.onDidTriggerButton(async e => {
+    switch ((e as GistButton).flag) {
       case ButtonType.MORE:
-        const oldlist = [...picks.items]
+        const oldlist = [...quickpick.items]
         page++
-        picks.busy = true
-        const newlist = await createPicklist(page, PER_PAGE, AjaxType.SHOW_AUTH_GISTS)
-        picks.items = [...oldlist, ...newlist]
-        picks.busy = false
+        quickpick.busy = true
+        const newlist = await createPicklist(page, per_page, AjaxType.SHOW_AUTH_GISTS)
+        quickpick.items = [...oldlist, ...newlist]
+        quickpick.busy = false
         break
       case ButtonType.CLEAR:
-        picks.selectedItems = []
-        break
-
-      default:
+        quickpick.selectedItems = []
         break
     }
+  })
+
+  quickpick.onDidTriggerItemButton(e => {
+    itemButtonTrigger(quickpick, e)
   })
 }

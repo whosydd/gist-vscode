@@ -24,9 +24,9 @@ export const ajaxListStarredGists = (page: number, per_page: number) => {
 }
 
 // list public gists
-// export const ajaxListPublicGists = (octokit: Octokit, page: number, per_page: number) => {
-//   return octokit.rest.gists.listPublic({ page, per_page })
-// }
+export const ajaxListPublicGists = (page: number, per_page: number) => {
+  return octokit.rest.gists.listPublic({ page, per_page })
+}
 
 // list other user public gists
 export const ajaxListUserGists = (page: number, per_page: number, username: string) => {
@@ -63,7 +63,7 @@ export const ajaxCreateGist = (files: CreateGistParams) => {
   return octokit.rest.gists.create(files)
 }
 
-// // update
+// TODO: update
 // export const updateGist = () => {
 //   console.log('修改gist')
 // }
@@ -71,6 +71,13 @@ export const ajaxCreateGist = (files: CreateGistParams) => {
 // delete
 export const ajaxDeleteGist = (gist_id: string) => {
   return octokit.rest.gists.delete({
+    gist_id,
+  })
+}
+
+// get a gist
+export const ajaxGetAuthGist = (gist_id: string) => {
+  return octokit.rest.gists.get({
     gist_id,
   })
 }

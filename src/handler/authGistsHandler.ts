@@ -7,15 +7,27 @@ import updatePicklist from '../utils/updatePicklist'
 export default async (type: AjaxType) => {
   let page = 1
   // per_page default 30
-  let PER_PAGE: number = workspace.getConfiguration('gist-vscode').get('per_page')!
+  let per_page: number = workspace.getConfiguration('gist-vscode').get('per_page')!
 
   const quickpick = window.createQuickPick()
   quickpick.show()
 
   quickpick.keepScrollPosition = true
+  quickpick.matchOnDescription = true
+
+  const tip = (list: GistQuickPickItem[]) => {
+    if (list.length < per_page) {
+      quickpick.title = undefined
+      quickpick.buttons = []
+    } else {
+      quickpick.title = `Loading More -->`
+      quickpick.buttons = [MORE]
+    }
+  }
+
   quickpick.busy = true
-  let picklist = await updatePicklist(page, PER_PAGE, type)
-  picklist.length < PER_PAGE ? (quickpick.buttons = []) : (quickpick.buttons = [MORE])
+  let picklist = await updatePicklist(page, per_page, type)
+  tip(picklist)
   quickpick.items = picklist
   quickpick.busy = false
 
@@ -24,16 +36,10 @@ export default async (type: AjaxType) => {
       case ButtonType.MORE:
         quickpick.busy = true
         const curList = [...quickpick.items]
-        const newPicklist = await updatePicklist(++page, PER_PAGE, type)
+        const newPicklist = await updatePicklist(++page, per_page, type)
         quickpick.items = [...curList, ...newPicklist]
         quickpick.busy = false
-
-        if (newPicklist.length < PER_PAGE) {
-          quickpick.buttons = []
-        }
-        break
-
-      default:
+        tip(newPicklist)
         break
     }
   })

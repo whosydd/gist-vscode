@@ -31,11 +31,8 @@ export default async (type: CreateGistType, file?: Uri) => {
     }
 
     if (type === CreateGistType.FILE) {
-      if (!file) {
-        return
-      }
-      filename = file.fsPath.split(path.sep).pop()!
-      content = readFileSync(file.fsPath, 'utf-8')
+      filename = file!.fsPath.split(path.sep).pop()!
+      content = readFileSync(file!.fsPath, 'utf-8')
     }
 
     // title
@@ -111,9 +108,9 @@ export default async (type: CreateGistType, file?: Uri) => {
           progress.report({ message: 'Waiting ...' })
           const res = await ajaxCreateGist(files)
           if (res.status === 201) {
-            window.showInformationMessage('Success.')
+            window.showInformationMessage('Created.')
           } else {
-            window.showErrorMessage(`Failed. ${res.status}`)
+            window.showErrorMessage(`Request failed. ${res.status}`)
           }
         }
       )

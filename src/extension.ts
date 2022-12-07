@@ -17,9 +17,9 @@ export function activate(context: vscode.ExtensionContext) {
   })
 
   // list public gists
-  // const showPublicGists = vscode.commands.registerCommand('gist-vscode.showPublicGists', () =>
-  //   showGistsHandler(AjaxType.SHOW_PUBLIC_GISTS)
-  // )
+  const showPublicGists = vscode.commands.registerCommand('gist-vscode.showPublicGists', () =>
+    authGistsHandler(AjaxType.SHOW_PUBLIC_GISTS)
+  )
 
   // list starred gists
   const showStarredGists = vscode.commands.registerCommand('gist-vscode.showStarredGists', () => {
@@ -50,20 +50,16 @@ export function activate(context: vscode.ExtensionContext) {
     generateHandler(folder)
   )
 
-  // dev
-  const dev = vscode.commands.registerCommand('gist-vscode.dev', userGistsHandler)
-
   const list = [
     setToken,
     showAuthGists,
-    // showPublicGists,
+    showPublicGists,
     showStarredGists,
     showUserGists,
     createGistBySelect,
     createGistByFile,
     deleteGists,
     generate,
-    dev,
   ]
 
   context.subscriptions.push(...list)

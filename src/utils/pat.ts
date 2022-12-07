@@ -7,35 +7,34 @@ export const setTokenHandler = async () => {
   // TODO: 多用户设置
   // const multi = vscode.workspace.getConfiguration('gist-for-vscode').get('multi')
 
-  // 提示设置token
+  // 设置token
   if (!token) {
-    token = await vscode.window.showInputBox({
-      title: 'Gist for VS Code',
-      value: 'Please enter <Personal access tokens> from https://github.com/settings/tokens',
+    const input = vscode.window.createInputBox()
+    input.show()
+    input.ignoreFocusOut = true
+    input.title = 'Set Token'
+    input.placeholder =
+      'Please enter <Personal access tokens> from https://github.com/settings/tokens'
+
+    input.onDidAccept(async () => {
+      token = input.value
+      if (input.value === '') {
+        input.placeholder = 'Nothing entered!'
+      } else {
+        if (!/^ghp_/.test(token)) {
+          input.value = ''
+          input.placeholder = 'The format is incorrect!'
+        } else {
+          input.hide()
+          await vscode.workspace.getConfiguration('gist-vscode').update('token', token, true)
+          await vscode.window.showInformationMessage('Success!')
+        }
+      }
     })
 
-    try {
-      if (!token) {
-        throw new Error('Setting has not been completed!')
-      }
-
-      if (token === '') {
-        throw new Error('Nothing entered!')
-      }
-
-      if (!/^ghp_/.test(token)) {
-        throw new Error('The format is incorrect!')
-      }
-
-      await vscode.workspace.getConfiguration('gist-vscode').update('token', token, true)
-      await vscode.window.showInformationMessage('Success!')
-    } catch (error: any) {
-      vscode.window.showWarningMessage(error.message, 'Try again', 'Later').then(value => {
-        if (value === 'Try again') {
-          vscode.commands.executeCommand('gist-vscode.setToken')
-        }
-      })
-    }
+    input.onDidHide(() => {
+      input.dispose()
+    })
   } else {
     vscode.window.showInformationMessage('Already done.', 'Open User Settings').then(value => {
       if (value === 'Open User Settings') {

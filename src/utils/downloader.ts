@@ -16,8 +16,13 @@ export default async (e: readonly GistQuickPickItem[]) => {
     prompt: 'Please use relative path.',
   })
 
+  if (input === undefined) {
+    window.showErrorMessage('Try again!')
+    return
+  }
+
   let dst = ''
-  if (input === undefined || input === '') {
+  if (input === '') {
     dst = rootPath
   } else {
     if (input.match(/\B\/.*/)) {
