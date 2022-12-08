@@ -17,7 +17,8 @@
     "type": "git",
     "url": "https://github.com/whosydd/gist-vscode.git"
   },
-  "icon": "./icon.png",
+  "icon": "icon.png",
+  "publisher": "whosydd",
   "activationEvents": [
     "onCommand:gist-vscode.setToken",
     "onCommand:gist-vscode.showAuthGists",
@@ -199,6 +200,7 @@
     ]
   },
   "scripts": {
+    "pnpm vsce package": "pnpm vsce package --no-dependencies",
     "vscode:prepublish": "pnpm run package",
     "compile": "webpack",
     "watch": "webpack --watch",
@@ -219,6 +221,7 @@
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "@vscode/test-electron": "^2.1.5",
+    "electron": "^22.0.0",
     "eslint": "^8.24.0",
     "glob": "^8.0.3",
     "mocha": "^10.0.0",
