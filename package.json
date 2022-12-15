@@ -17,7 +17,7 @@
     "type": "git",
     "url": "https://github.com/whosydd/gist-vscode.git"
   },
-  "icon": "icon.png",
+  "icon": "github.png",
   "publisher": "whosydd",
   "activationEvents": [
     "onCommand:gist-vscode.setToken",
@@ -28,8 +28,7 @@
     "onCommand:gist-vscode.createGistBySelect",
     "onCommand:gist-vscode.createGistByFile",
     "onCommand:gist-vscode.deleteGists",
-    "onCommand:gist-vscode.generate",
-    "onCommand:gist-vscode.dev"
+    "onCommand:gist-vscode.generate"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -78,11 +77,6 @@
       {
         "command": "gist-vscode.generate",
         "title": "Generate Files By Gist",
-        "category": "Gist"
-      },
-      {
-        "command": "gist-vscode.dev",
-        "title": "DEV",
         "category": "Gist"
       }
     ],
@@ -159,7 +153,7 @@
         "properties": {
           "gist-vscode.token": {
             "type": "string",
-            "description": "<Personal access tokens> from https://github.com/settings/tokens"
+            "description": "<Personal Access Tokens> from https://github.com/settings/tokens"
           },
           "gist-vscode.multi": {
             "type": "boolean",
