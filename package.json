@@ -1,0 +1,232 @@
+{
+  "name": "gist-vscode",
+  "displayName": "Gist for VS Code",
+  "description": "generate code from gist",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "author": {
+    "name": "GY",
+    "email": "dev.youngkwok718@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whosydd/gist-vscode.git"
+  },
+  "icon": "github.png",
+  "publisher": "whosydd",
+  "activationEvents": [
+    "onCommand:gist-vscode.setToken",
+    "onCommand:gist-vscode.showAuthGists",
+    "onCommand:gist-vscode.showPublicGists",
+    "onCommand:gist-vscode.showStarredGists",
+    "onCommand:gist-vscode.showUserGists",
+    "onCommand:gist-vscode.createGistBySelect",
+    "onCommand:gist-vscode.createGistByFile",
+    "onCommand:gist-vscode.deleteGists",
+    "onCommand:gist-vscode.generate"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gist-vscode.setToken",
+        "title": "Set Token",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.showAuthGists",
+        "title": "List Gists For Authenticated User",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.showPublicGists",
+        "title": "List Public Gists",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.showStarredGists",
+        "title": "List Starred Gists",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.showUserGists",
+        "title": "List Gists For User",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.createGistBySelect",
+        "title": "Create Gist By Select",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.createGistByFile",
+        "title": "Create Gist By File",
+        "category": "Gist",
+        "icon": "$(github)"
+      },
+      {
+        "command": "gist-vscode.deleteGists",
+        "title": "Delete Gists",
+        "category": "Gist"
+      },
+      {
+        "command": "gist-vscode.generate",
+        "title": "Generate Files By Gist",
+        "category": "Gist"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "when": "null"
+        },
+        {
+          "command": "gist-vscode.createGistBySelect",
+          "when": "null"
+        },
+        {
+          "command": "gist-vscode.generate",
+          "when": "null"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "group": "navigation",
+          "when": "config.gist-vscode.showTitleIcon"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "group": "0_modification",
+          "when": "editorFocus && !editorHasSelection"
+        },
+        {
+          "command": "gist-vscode.createGistBySelect",
+          "group": "0_modification",
+          "when": "editorHasSelection"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "gist-vscode.createGistByFile",
+          "group": "0_modification",
+          "when": "filesExplorerFocus && !explorerResourceIsFolder && !inputFocus"
+        },
+        {
+          "command": "gist-vscode.showAuthGists",
+          "group": "0_modification",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "gist-vscode.showPublicGists",
+          "group": "0_modification",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "gist-vscode.showStarredGists",
+          "group": "0_modification",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "gist-vscode.showUserGists",
+          "group": "0_modification",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "gist-vscode.generate",
+          "group": "1_modification",
+          "when": "explorerResourceIsFolder"
+        }
+      ]
+    },
+    "configuration": [
+      {
+        "title": "Gist for VSCode: Configuration",
+        "properties": {
+          "gist-vscode.token": {
+            "type": "string",
+            "description": "<Personal Access Tokens> from https://github.com/settings/tokens"
+          },
+          "gist-vscode.multi": {
+            "type": "boolean",
+            "default": false,
+            "description": "Now it's not working at all!"
+          },
+          "gist-vscode.per_page": {
+            "type": "number",
+            "maximum": 100,
+            "default": 30,
+            "description": "Data per request"
+          },
+          "gist-vscode.showTitleIcon": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show icon on the editor title"
+          },
+          "gist-vscode.generate": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "label",
+                "url"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "pnpm vsce package": "pnpm vsce package --no-dependencies",
+    "vscode:prepublish": "pnpm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@octokit/types": "^8.0.0",
+    "@types/download": "^8.0.1",
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.73.0",
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "@vscode/test-electron": "^2.1.5",
+    "electron": "^22.0.0",
+    "eslint": "^8.24.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.0.0",
+    "prettier": "^2.8.0",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.8.4",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "@octokit/rest": "^19.0.5",
+    "download": "^8.0.0"
+  }
+}
