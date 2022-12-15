@@ -34,6 +34,9 @@ export default () => {
       quickpick.show()
       quickpick.busy = true
       let picklist = await updatePicklist(1, per_page, AjaxType.SHOW_USER_GISTS, username)
+      if (!picklist) {
+        return
+      }
       if (picklist.length === 0) {
         quickpick.items = [{ label: 'Back' }]
       } else {
@@ -80,6 +83,10 @@ export default () => {
           AjaxType.SHOW_USER_GISTS,
           username
         )
+
+        if (!newPicklist) {
+          return
+        }
 
         quickpick.items = [...curList, ...newPicklist]
         quickpick.busy = false

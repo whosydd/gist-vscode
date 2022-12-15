@@ -17,7 +17,6 @@ export default async (e: readonly GistQuickPickItem[]) => {
   })
 
   if (input === undefined) {
-    window.showErrorMessage('Try again!')
     return
   }
 

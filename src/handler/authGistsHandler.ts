@@ -27,6 +27,11 @@ export default async (type: AjaxType) => {
 
   quickpick.busy = true
   let picklist = await updatePicklist(page, per_page, type)
+
+  if (!picklist) {
+    return
+  }
+
   tip(picklist)
   quickpick.items = picklist
   quickpick.busy = false
@@ -37,6 +42,9 @@ export default async (type: AjaxType) => {
         quickpick.busy = true
         const curList = [...quickpick.items]
         const newPicklist = await updatePicklist(++page, per_page, type)
+        if (!newPicklist) {
+          return
+        }
         quickpick.items = [...curList, ...newPicklist]
         quickpick.busy = false
         tip(newPicklist)

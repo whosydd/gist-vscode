@@ -14,7 +14,7 @@ export default async (type: CreateGistType, file?: Uri) => {
       // 获取选中代码块
       const editor = window.activeTextEditor
       if (!editor) {
-        throw new Error('Got a bug!')
+        throw new Error('Please open a file first!')
       }
       const {
         document: { lineAt, getText },

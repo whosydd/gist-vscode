@@ -2,7 +2,7 @@ import { ProgressLocation, window, workspace } from 'vscode'
 import { ajaxDeleteGist } from '../utils/ajax'
 import { itemButtonTrigger } from '../utils/buttonTrigger'
 import { AjaxType, ButtonType, CLEAR, GistButton, GistQuickPickItem, MORE } from '../utils/types'
-import createPicklist from '../utils/updatePicklist'
+import updatePicklist from '../utils/updatePicklist'
 
 export default async () => {
   let page = 1
@@ -12,7 +12,12 @@ export default async () => {
   quickpick.show()
   quickpick.canSelectMany = true
   quickpick.busy = true
-  const picklist = await createPicklist(page, per_page, AjaxType.SHOW_AUTH_GISTS)
+  const picklist = await updatePicklist(page, per_page, AjaxType.SHOW_AUTH_GISTS)
+
+  if (!picklist) {
+    return
+  }
+
   quickpick.items = picklist
   quickpick.buttons = [CLEAR, MORE]
   quickpick.busy = false
@@ -43,7 +48,12 @@ export default async () => {
         const oldlist = [...quickpick.items]
         page++
         quickpick.busy = true
-        const newlist = await createPicklist(page, per_page, AjaxType.SHOW_AUTH_GISTS)
+        const newlist = await updatePicklist(page, per_page, AjaxType.SHOW_AUTH_GISTS)
+
+        if (!newlist) {
+          return
+        }
+
         quickpick.items = [...oldlist, ...newlist]
         quickpick.busy = false
         break

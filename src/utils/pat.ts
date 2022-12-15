@@ -12,9 +12,15 @@ export const setTokenHandler = async () => {
     const input = vscode.window.createInputBox()
     input.show()
     input.ignoreFocusOut = true
-    input.title = 'Set Token'
+    input.title = 'Gist For VS Code: Set Token'
+    input.buttons = [
+      {
+        iconPath: new vscode.ThemeIcon('github'),
+        tooltip: 'Get personal access tokens from github',
+      },
+    ]
     input.placeholder =
-      'Please enter <Personal access tokens> from https://github.com/settings/tokens'
+      'Please enter <Personal Access Tokens> from https://github.com/settings/tokens'
 
     input.onDidAccept(async () => {
       token = input.value
@@ -27,9 +33,19 @@ export const setTokenHandler = async () => {
         } else {
           input.hide()
           await vscode.workspace.getConfiguration('gist-vscode').update('token', token, true)
-          await vscode.window.showInformationMessage('Success!')
+          vscode.window
+            .showInformationMessage('Success! Please reload vscode to enable it.', 'Reload Now')
+            .then(value => {
+              if (value === 'Reload Now') {
+                vscode.commands.executeCommand('workbench.action.reloadWindow')
+              }
+            })
         }
       }
+    })
+
+    input.onDidTriggerButton(async e => {
+      await vscode.env.openExternal(vscode.Uri.parse(`https://github.com/settings/tokens`))
     })
 
     input.onDidHide(() => {
