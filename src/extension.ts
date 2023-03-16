@@ -12,24 +12,23 @@ export function activate(context: vscode.ExtensionContext) {
   const setToken = vscode.commands.registerCommand('gist-vscode.setToken', setTokenHandler)
 
   // list auth user gists
-  const showAuthGists = vscode.commands.registerCommand('gist-vscode.showAuthGists', () => {
-    authGistsHandler(AjaxType.SHOW_AUTH_GISTS)
+  const showAuthGists = vscode.commands.registerCommand('gist-vscode.showAuthGists', uri => {
+    authGistsHandler(uri, AjaxType.SHOW_AUTH_GISTS)
   })
 
   // list public gists
-  const showPublicGists = vscode.commands.registerCommand('gist-vscode.showPublicGists', () =>
-    authGistsHandler(AjaxType.SHOW_PUBLIC_GISTS)
+  const showPublicGists = vscode.commands.registerCommand('gist-vscode.showPublicGists', uri =>
+    authGistsHandler(uri, AjaxType.SHOW_PUBLIC_GISTS)
   )
 
   // list starred gists
-  const showStarredGists = vscode.commands.registerCommand('gist-vscode.showStarredGists', () => {
-    authGistsHandler(AjaxType.SHOW_STARRED_GISTS)
+  const showStarredGists = vscode.commands.registerCommand('gist-vscode.showStarredGists', uri => {
+    authGistsHandler(uri, AjaxType.SHOW_STARRED_GISTS)
   })
 
   // list other user gists
-  const showUserGists = vscode.commands.registerCommand(
-    'gist-vscode.showUserGists',
-    userGistsHandler
+  const showUserGists = vscode.commands.registerCommand('gist-vscode.showUserGists', uri =>
+    userGistsHandler(uri)
   )
 
   // create a gist by selected
@@ -46,8 +45,8 @@ export function activate(context: vscode.ExtensionContext) {
   const deleteGists = vscode.commands.registerCommand('gist-vscode.deleteGists', deleteGistsHandler)
 
   // generate
-  const generate = vscode.commands.registerCommand('gist-vscode.generate', folder =>
-    generateHandler(folder)
+  const generate = vscode.commands.registerCommand('gist-vscode.generate', uri =>
+    generateHandler(uri)
   )
 
   const list = [

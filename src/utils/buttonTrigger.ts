@@ -80,7 +80,7 @@ export const itemButtonTrigger = async (
         .getConfiguration('gist-vscode')
         .get('generate')!
 
-      const item = { label, url: `https://gist.github.com/${user}/${gist_id}` }
+      const item = { label, description, url: `https://gist.github.com/${user}/${gist_id}` }
 
       let flag = false
       generate.forEach(item => {

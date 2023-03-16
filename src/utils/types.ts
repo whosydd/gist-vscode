@@ -15,6 +15,7 @@ export interface GistButton extends QuickInputButton {
 
 export type GenerateItem = {
   label: string
+  description: string
   url: string
 }
 

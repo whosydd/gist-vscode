@@ -1,9 +1,10 @@
-import { QuickInputButton, window, workspace } from 'vscode'
+import { QuickInputButton, Uri, window, workspace } from 'vscode'
 import { itemButtonTrigger } from '../utils/buttonTrigger'
-import { AjaxType, BACK, ButtonType, GistButton, MORE } from '../utils/types'
+import downloader from '../utils/downloader'
+import { AjaxType, BACK, ButtonType, GistButton, GistQuickPickItem, MORE } from '../utils/types'
 import updatePicklist from '../utils/updatePicklist'
 
-export default () => {
+export default (uri: Uri) => {
   let page = 1
   // per_page default 30
   let per_page: number = workspace.getConfiguration('gist-vscode').get('per_page')!
@@ -58,12 +59,19 @@ export default () => {
     }
   })
 
-  quickpick.onDidChangeSelection(e => {
+  quickpick.onDidChangeSelection(async e => {
     const label = e[0].label
 
     if (e.length === 1 && label === 'Back') {
       input.show()
       quickpick.placeholder = ''
+    }
+
+    try {
+      await downloader(uri, e as GistQuickPickItem[])
+      quickpick.dispose()
+    } catch (err: any) {
+      window.showErrorMessage(`Download Failed. ${err.message}`)
     }
   })
 
