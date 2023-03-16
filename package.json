@@ -2,7 +2,7 @@
   "name": "gist-vscode",
   "displayName": "Gist for VS Code",
   "description": "generate code from gist",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.73.0"
   },
@@ -40,7 +40,7 @@
       },
       {
         "command": "gist-vscode.showAuthGists",
-        "title": "List Gists For Authenticated User",
+        "title": "List Gists",
         "category": "Gist"
       },
       {
@@ -126,21 +126,6 @@
           "when": "explorerResourceIsFolder"
         },
         {
-          "command": "gist-vscode.showPublicGists",
-          "group": "0_modification",
-          "when": "explorerResourceIsFolder"
-        },
-        {
-          "command": "gist-vscode.showStarredGists",
-          "group": "0_modification",
-          "when": "explorerResourceIsFolder"
-        },
-        {
-          "command": "gist-vscode.showUserGists",
-          "group": "0_modification",
-          "when": "explorerResourceIsFolder"
-        },
-        {
           "command": "gist-vscode.generate",
           "group": "1_modification",
           "when": "explorerResourceIsFolder"
@@ -154,11 +139,6 @@
           "gist-vscode.token": {
             "type": "string",
             "description": "<Personal Access Tokens> from https://github.com/settings/tokens"
-          },
-          "gist-vscode.multi": {
-            "type": "boolean",
-            "default": false,
-            "description": "Now it's not working at all!"
           },
           "gist-vscode.per_page": {
             "type": "number",
@@ -181,6 +161,9 @@
               ],
               "properties": {
                 "label": {
+                  "type": "string"
+                },
+                "description": {
                   "type": "string"
                 },
                 "url": {
