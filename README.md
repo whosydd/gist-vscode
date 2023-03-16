@@ -10,19 +10,20 @@
 ### Commands
 
 - Gist: Set Token
-- Gist: List Gists For Authenticated User
+- Gist: List Gists
 - Gist: List Starred Gists
 - Gist: List Gists For User
 - Gist: List Public Gists
 - Gist: Delete Gists
 
+![image-20230316214357182](https://raw.githubusercontent.com/whosydd/images-in-one/main/images/202303162144121.png)
+
 ### Explorer/Context
 
-- List Gists For Authenticated User
-- List Gists For User
-- List Public Gists
-- List Starred Gists
+- List Gists
 - Generate Files By Gist
+
+![image-20230316214724341](https://raw.githubusercontent.com/whosydd/images-in-one/main/images/202303162147541.png)
 
 ### Create Gist By Select
 
@@ -66,12 +67,9 @@ Show icon on the editor title. Default is `false`
     "gist-vscode.generate": [
     {
       "label": ".prettierrc",
+      "description": "prettier config file", // optional
       "url": "https://gist.github.com/whosydd/3d7554d6818b0f9c9a2ec8e928857211"
     },
-    {
-      "label": ".editorconfig",
-      "url": "https://gist.github.com/whosydd/fcdefbc52a94f561bf03e08b9e3628d7"
-    }
     //...
   ]
 }
